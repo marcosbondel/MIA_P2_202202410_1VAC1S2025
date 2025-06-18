@@ -1,0 +1,17 @@
+# Eliminar disco si existe
+rmdisk -driveletter=A
+
+# Crear un nuevo disco
+mkdisk -size=50 -unit=m -fit=ff
+
+# Crear una partición primaria
+fdisk -size=20 -driveletter=A -name=Particion1
+
+# Montar la partición
+mount -driveletter=A -name=Particion1
+
+# Formatear la partición como EXT2
+mkfs -id=A110 -type=full -fs=2fs
+
+# Intentar login con el usuario root
+login -user=root -pass=123 -id=A110

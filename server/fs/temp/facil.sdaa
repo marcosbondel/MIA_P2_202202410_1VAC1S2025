@@ -1,0 +1,6 @@
+# Test fácil: Crear disco, partición y montar
+rmdisk -driveletter=A
+mkdisk -size=50 -unit=M -fit=BF
+fdisk -size=20 -driveletter=A -name=part1
+mount -driveletter=A -name=part1
+mkfs -id=A110 -type=full -fs=ext2

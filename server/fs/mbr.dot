@@ -1,0 +1,38 @@
+digraph G {
+node [shape=none fontname="Helvetica"];
+mbr [label=<
+<table border='1' cellborder='1' cellspacing='0' cellpadding='4'>
+<tr><td bgcolor='purple' colspan='2'><font color='white'><b>REPORTE DE MBR</b></font></td></tr>
+<tr><td bgcolor='#f2e6ff'><b>mbr_tamano</b></td><td>10485760</td></tr>
+<tr><td bgcolor='#f2e6ff'><b>mbr_fecha_creacion</b></td><td>2025-05-01</td></tr>
+<tr><td bgcolor='#f2e6ff'><b>mbr_disk_signature</b></td><td>0xA</td></tr>
+<tr><td bgcolor='indigo' colspan='2'><font color='white'><b>Partition</b></font></td></tr>
+<tr><td><b>part_status</b></td><td>1</td></tr>
+<tr><td><b>part_type</b></td><td>p</td></tr>
+<tr><td><b>part_fit</b></td><td>w</td></tr>
+<tr><td><b>part_start</b></td><td>159</td></tr>
+<tr><td><b>part_size</b></td><td>512000</td></tr>
+<tr><td><b>part_name</b></td><td>particion1</td></tr>
+<tr><td bgcolor='indigo' colspan='2'><font color='white'><b>Partition</b></font></td></tr>
+<tr><td><b>part_status</b></td><td>0</td></tr>
+<tr><td><b>part_type</b></td><td>p</td></tr>
+<tr><td><b>part_fit</b></td><td>w</td></tr>
+<tr><td><b>part_start</b></td><td>512159</td></tr>
+<tr><td><b>part_size</b></td><td>716800</td></tr>
+<tr><td><b>part_name</b></td><td>particion2</td></tr>
+<tr><td bgcolor='indigo' colspan='2'><font color='white'><b>Partition</b></font></td></tr>
+<tr><td><b>part_status</b></td><td>0</td></tr>
+<tr><td><b>part_type</b></td><td>p</td></tr>
+<tr><td><b>part_fit</b></td><td>w</td></tr>
+<tr><td><b>part_start</b></td><td>1228959</td></tr>
+<tr><td><b>part_size</b></td><td>921600</td></tr>
+<tr><td><b>part_name</b></td><td>particion3</td></tr>
+<tr><td bgcolor='indigo' colspan='2'><font color='white'><b>Partition</b></font></td></tr>
+<tr><td><b>part_status</b></td><td>0</td></tr>
+<tr><td><b>part_type</b></td><td>e</td></tr>
+<tr><td><b>part_fit</b></td><td>w</td></tr>
+<tr><td><b>part_start</b></td><td>2150559</td></tr>
+<tr><td><b>part_size</b></td><td>921600</td></tr>
+<tr><td><b>part_name</b></td><td>particion4</td></tr>
+</table>>];
+}

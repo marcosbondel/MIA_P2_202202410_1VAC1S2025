@@ -1,0 +1,14 @@
+# Test intermedio: Usuarios y grupos
+# Eliminar disco si existe
+rmdisk -driveletter=A
+mkdisk -size=100 -unit=M -fit=WF
+fdisk -size=40 -driveletter=A -name=data
+mount -driveletter=A -name=data
+mkfs -id=A110 -type=full -fs=ext2
+
+login -user=root -pass=123 -id=A110
+mkgrp -name=ventas
+mkgrp -name=rrhh
+mkusr -user=maria -pass=1234 -grp=ventas
+mkusr -user=juan -pass=5678 -grp=rrhh
+logout

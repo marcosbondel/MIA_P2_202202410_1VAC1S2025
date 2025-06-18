@@ -1,0 +1,5 @@
+1,G,root
+1,U,root,root,123
+2,G,usuarios
+2,U,usuarios,juan,password123
+3,U,usuarios,maria,maria321
