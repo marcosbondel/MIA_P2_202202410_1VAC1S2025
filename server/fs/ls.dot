@@ -1,9 +1,0 @@
-digraph G {
-node [shape=plaintext fontname="Helvetica"];
-ls [label=<
-<table border='1' cellborder='1' cellspacing='0'>
-<tr><td><b>Permisos</b></td><td><b>Owner</b></td><td><b>Grupo</b></td><td><b>Size (en Bytes)</b></td><td><b>Fecha</b></td><td><b>Hora</b></td><td><b>Tipo</b></td><td><b>Name</b></td></tr>
-<tr><td>664</td><td>User1</td><td>Grupo1</td><td>169</td><td>16/06/2025</td><td></td><td>Archivo</td><td>users.txt</td></tr>
-<tr><td>777</td><td>User1</td><td>Grupo1</td><td>0</td><td></td><td></td><td>Carpeta</td><td>home</td></tr>
-</table>>];
-}

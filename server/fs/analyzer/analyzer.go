@@ -1,11 +1,11 @@
 package analyzer
 
 import (
-	"MIA_P1_202202410_1VAC1S2025/disk_management"
-	"MIA_P1_202202410_1VAC1S2025/file_manager"
-	"MIA_P1_202202410_1VAC1S2025/file_system"
-	"MIA_P1_202202410_1VAC1S2025/reports_generator"
-	"MIA_P1_202202410_1VAC1S2025/user"
+	"MIA_P2_202202410_1VAC1S2025/fs/disk_management"
+	"MIA_P2_202202410_1VAC1S2025/fs/file_manager"
+	"MIA_P2_202202410_1VAC1S2025/fs/file_system"
+	"MIA_P2_202202410_1VAC1S2025/fs/reports_generator"
+	"MIA_P2_202202410_1VAC1S2025/fs/user"
 	"bufio"
 	"flag"
 	"fmt"

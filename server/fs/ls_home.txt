@@ -1,4 +1,0 @@
-Permisos	Owner	Grupo	Size(Bytes)	Fecha		Hora		Tipo		Name
-------------------------------------------------------------------------------------------
-664	User1	Grupo1	169		16/06/2025		Archivo	users.txt
-777	User1	Grupo1	0				Carpeta	home

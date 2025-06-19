@@ -1,10 +1,10 @@
 package reports_generator
 
 import (
-	"MIA_P1_202202410_1VAC1S2025/global"
-	"MIA_P1_202202410_1VAC1S2025/structs"
-	"MIA_P1_202202410_1VAC1S2025/utils"
-	"MIA_P1_202202410_1VAC1S2025/utils_inodes"
+	"MIA_P2_202202410_1VAC1S2025/fs/global"
+	"MIA_P2_202202410_1VAC1S2025/fs/structs"
+	"MIA_P2_202202410_1VAC1S2025/fs/utils"
+	"MIA_P2_202202410_1VAC1S2025/fs/utils_inodes"
 	"encoding/binary"
 	"fmt"
 	"html"

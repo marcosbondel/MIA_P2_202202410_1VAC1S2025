@@ -1,8 +1,8 @@
 package file_system
 
 import (
-	"MIA_P1_202202410_1VAC1S2025/structs"
-	"MIA_P1_202202410_1VAC1S2025/utils"
+	"MIA_P2_202202410_1VAC1S2025/fs/structs"
+	"MIA_P2_202202410_1VAC1S2025/fs/utils"
 	"encoding/binary"
 	"fmt"
 	"os"
