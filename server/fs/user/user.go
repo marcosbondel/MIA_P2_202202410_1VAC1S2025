@@ -2,7 +2,6 @@ package user
 
 import (
 	//  "os"
-
 	"MIA_P2_202202410_1VAC1S2025/fs/global"
 	"MIA_P2_202202410_1VAC1S2025/fs/structs"
 	"MIA_P2_202202410_1VAC1S2025/fs/utils"
@@ -13,50 +12,50 @@ import (
 )
 
 // // login -user=root -pass=123 -id=A119
-func Login(user string, pass string, id string) {
+func Login(user string, pass string, id string) bool {
 	fmt.Println("======Start LOGIN======")
 	fmt.Println("User:", user)
 	fmt.Println("Pass:", pass)
 	fmt.Println("Id:", id)
 
 	if global.CurrentUser.Status {
-		fmt.Println("User already logged in")
-		return
+		//fmt.Println("User already logged in")
+		return false
 	}
 
 	var login bool = false
 	driveletter := string(id[0])
 
 	// Open bin file
-	filepath := "./test/" + strings.ToUpper(driveletter) + ".bin"
+	filepath := "./fs/test/" + strings.ToUpper(driveletter) + ".bin"
 	file, err := utils.OpenFile(filepath)
 	if err != nil {
-		return
+		return false
 	}
 
 	var TempMBR structs.MRB
 	// Read object from bin file
 	if err := utils.ReadObject(file, &TempMBR, 0); err != nil {
-		return
+		return false
 	}
 
 	// Print object
 	structs.PrintMBR(TempMBR)
 
-	fmt.Println("-------------")
+	//fmt.Println("-------------")
 
 	var index int = -1
 	// Iterate over the partitions
 	for i := 0; i < 4; i++ {
 		if TempMBR.Partitions[i].Size != 0 {
 			if strings.Contains(string(TempMBR.Partitions[i].Id[:]), id) {
-				fmt.Println("Partition found")
+				//fmt.Println("Partition found")
 				if strings.Contains(string(TempMBR.Partitions[i].Status[:]), "1") {
-					fmt.Println("Partition is mounted")
+					//fmt.Println("Partition is mounted")
 					index = i
 				} else {
-					fmt.Println("Partition is not mounted")
-					return
+					//fmt.Println("Partition is not mounted")
+					return false
 				}
 				break
 			}
@@ -66,14 +65,14 @@ func Login(user string, pass string, id string) {
 	if index != -1 {
 		structs.PrintPartition(TempMBR.Partitions[index])
 	} else {
-		fmt.Println("Partition not found")
-		return
+		//fmt.Println("Partition not found")
+		return false
 	}
 
 	var tempSuperblock structs.Superblock
 	// Read object from bin file
 	if err := utils.ReadObject(file, &tempSuperblock, int64(TempMBR.Partitions[index].Start)); err != nil {
-		return
+		return false
 	}
 
 	// initSearch /users.txt -> regresa no Inodo
@@ -85,13 +84,13 @@ func Login(user string, pass string, id string) {
 	var crrInode structs.Inode
 	// Read object from bin file
 	if err := utils.ReadObject(file, &crrInode, int64(tempSuperblock.S_inode_start+indexInode*int32(binary.Size(structs.Inode{})))); err != nil {
-		return
+		return false
 	}
 
 	// read file data
 	data := utils_inodes.GetInodeFileData(crrInode, file, tempSuperblock)
 
-	fmt.Println("Fileblock------------")
+	//fmt.Println("Fileblock------------")
 	// Dividir la cadena en líneas
 	lines := strings.Split(data, "\n")
 
@@ -100,9 +99,9 @@ func Login(user string, pass string, id string) {
 	// Iterar a través de las líneas
 	for _, line := range lines {
 		// Imprimir cada línea
-		// fmt.Println(line)
+		// //fmt.Println(line)
 		words := strings.Split(line, ",")
-		fmt.Println("Words:", words)
+		//fmt.Println("Words:", words)
 		if len(words) == 5 {
 			if (strings.Contains(words[3], user)) && (strings.Contains(words[4], pass)) {
 				login = true
@@ -113,31 +112,33 @@ func Login(user string, pass string, id string) {
 	}
 
 	// Print object
-	fmt.Println("Inode", crrInode.I_block)
+	//fmt.Println("Inode", crrInode.I_block)
 
 	// Close bin file
 	defer file.Close()
 
 	if login {
-		fmt.Println("User logged in")
+		//fmt.Println("User logged in")
 		global.CurrentUser.ID = id
 		global.CurrentUser.Status = true
 		global.CurrentUser.User = user
 	} else {
-		fmt.Println("User not found or invalid credentials")
+		//fmt.Println("User not found or invalid credentials")
+		return false
 	}
 
 	fmt.Println("======End LOGIN======")
+	return true
 }
 
 func Logout() {
-	fmt.Println("======Start LOGOUT======")
+	//fmt.Println("======Start LOGOUT======")
 	if global.CurrentUser.Status {
 		global.CurrentUser.ID = ""
 		global.CurrentUser.Status = false
-		fmt.Println("User logged out")
+		//fmt.Println("User logged out")
 	} else {
-		fmt.Println("No user logged in")
+		//fmt.Println("No user logged in")
 	}
-	fmt.Println("======End LOGOUT======")
+	//fmt.Println("======End LOGOUT======")
 }

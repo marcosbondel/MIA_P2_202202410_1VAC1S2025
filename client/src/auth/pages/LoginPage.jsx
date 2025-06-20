@@ -1,23 +1,24 @@
-import { Button, Grid, TextField, Typography } from "@mui/material"
+import { Button, Grid, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material"
 import { useForm } from "../../hooks"
-import { useContext } from "react"
+import { useContext, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { AppContext } from "../../context/AppContext"
 
 export const LoginPage = () => {
 
-    const { onLogin } = useContext(AppContext)
+    const { onLogin, disks } = useContext(AppContext)
     const navigate = useNavigate()
 
-    const {username, password, onInputChange} = useForm({
-        username: 'root',
-        password: 'pass'
+    const {id, username, password, onInputChange} = useForm({
+        id: '',
+        username: '',
+        password: '',
     })
 
     const onSubmit = (e) => {
         e.preventDefault()
-        onLogin(username, password)
-        navigate('/mia')
+        onLogin(id, username, password)
+        // navigate('/mia')
     }
 
     return (
@@ -46,6 +47,17 @@ export const LoginPage = () => {
                     <Grid container>
                         <Grid item size={ 12 } sx={{mt: 2}}>
                             <TextField 
+                                label="ID" 
+                                type="text" 
+                                placeholder="ID"
+                                name="id"
+                                value={id}
+                                onChange={onInputChange}
+                                fullWidth
+                            />
+                        </Grid>
+                        <Grid item size={ 12 } sx={{mt: 2}}>
+                            <TextField 
                                 label="Username" 
                                 type="text" 
                                 placeholder="Write your username"
@@ -54,7 +66,6 @@ export const LoginPage = () => {
                                 onChange={onInputChange}
                                 fullWidth
                             />
-
                         </Grid>
                         <Grid item size={ 12 } sx={{mt: 2}}>
                             <TextField 

@@ -1,24 +1,18 @@
 
-export const appReducer = ( state = initial_state, action) => {
+export const appReducer = ( state, action) => {
     switch (action.type) {
-        case 'options[add]':
-            
+        case 'disks[set]':
             return {
                 ...state,
-                options: action.payload.options
+                disks: action.payload.disks
             }
-        case 'result[add]':
+        case 'error[set]':
+            console.log("action.payload: ", action.payload)
+            console.log("action.payload.error: ", action.payload['error'])
             return {
                 ...state,
-                error: {},
-                result: action.payload
-            }
-            
-        case 'error[add]':
-            return {
-                ...state,
-                result: {},
-                error: action.payload
+                showError: action.payload.error != "",
+                error: action.payload.error
             }
         default:
             break;
