@@ -1,0 +1,13 @@
+// package main
+
+// import (
+// 	"fmt"
+
+// 	"MIA_P2_202202410_1VAC1S2025/fs/analyzer"
+// )
+
+// func main() {
+// 	fmt.Println("===Start===")
+// 	analyzer.Analyze()
+// 	fmt.Println("===End===")
+// }
