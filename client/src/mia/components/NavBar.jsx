@@ -1,8 +1,18 @@
 
 import { LogoutOutlined, MenuOutlined } from "@mui/icons-material"
 import { AppBar, Box, Button, Grid, IconButton, Toolbar, Typography } from "@mui/material"
+import { useContext } from "react"
+import { AppContext } from "../../context/AppContext"
 
 export const NavBar = () => {
+
+    const { logout } = useContext(AppContext)
+
+    const onLogout = async (e) => {
+        e.preventDefault()
+        await logout()
+    }
+
     return (
         <AppBar 
             position="fixed"
@@ -31,7 +41,9 @@ export const NavBar = () => {
                     {/* <IconButton color='info' size="large">
                         <LogoutOutlined size="large"/>
                     </IconButton> */}
-                    <Button variant="contained">Logout</Button>
+                    <form onSubmit={onLogout}>
+                        <Button variant="contained" type="submit">Logout</Button>
+                    </form>
                 </Grid>
             </Toolbar>
         </AppBar>

@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const init = () => {
     return {
+        logged: JSON.parse(localStorage.getItem('logged')) || false,
         error: "",
         result: {},
         showError: false,
@@ -17,9 +18,7 @@ export const AppProvider = ({ children }) => {
     const [state, dispatch] = useReducer(appReducer, {}, init)
     const navigate = useNavigate();
 
-    const onLogin = async(id, username, password) => {
-        console.log(username, password);
-        dispatch({ type: 'error[set]', payload: { error: "" } });
+    const login = async(id, username, password) => {
         const response = await fetch('http://localhost:3000/api/auth/login', {
             method: 'POST',
             headers: {
@@ -30,13 +29,15 @@ export const AppProvider = ({ children }) => {
 
         if(!response.ok) {
             const error = await response.json();
-            console.error("Login failed:", error);
             dispatch({ type: 'error[set]', payload: { error: "Login failed :("} });
             return;
         }
 
         const data = await response.json();
         console.log("Login successful:", data);
+        dispatch({ type: 'logged[set]', payload: { logged: true } });
+        localStorage.setItem('logged', JSON.stringify(true));
+
         navigate('/mia')
     }
 
@@ -56,6 +57,27 @@ export const AppProvider = ({ children }) => {
         return disks;
     }
 
+    const logout = async() => {
+        const response = await fetch('http://localhost:3000/api/auth/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+
+        if(!response.ok){
+            dispatch({ type: 'error[set]', payload: { error: "Logout failed :("} });
+            return
+        }
+
+        dispatch({ type: 'logged[set]', payload: { logged: false } });
+        localStorage.removeItem('logged');
+        console.log("Logout successful");
+
+        navigate('/login');
+    }
+
     useEffect(() => {
 
         if (Object.keys(state.disks).length !== 0) return
@@ -68,8 +90,9 @@ export const AppProvider = ({ children }) => {
     return (
         <AppContext.Provider value={{
             ...state,
-            onLogin,
+            login,
             getDisks,
+            logout
         }}>
             {children}
             {/* { state.error.length != 0 && */}

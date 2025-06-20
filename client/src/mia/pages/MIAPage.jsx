@@ -33,7 +33,7 @@ export const MIAPage = () => {
                             alignItems="center"
                         >
                             { disks.map((disk) => (
-                                <Grid item xs={12} sm={6} md={4} lg={3}>
+                                <Grid key={disk.name} item xs={12} sm={6} md={4} lg={3}>
                                     <Card sx={{ minWidth: 275 }}>
                                         <CardContent>
                                             <Typography>Disk</Typography>

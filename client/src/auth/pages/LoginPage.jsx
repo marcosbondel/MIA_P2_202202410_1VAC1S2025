@@ -6,7 +6,7 @@ import { AppContext } from "../../context/AppContext"
 
 export const LoginPage = () => {
 
-    const { onLogin, disks } = useContext(AppContext)
+    const { login, disks } = useContext(AppContext)
     const navigate = useNavigate()
 
     const {id, username, password, onInputChange} = useForm({
@@ -17,7 +17,7 @@ export const LoginPage = () => {
 
     const onSubmit = (e) => {
         e.preventDefault()
-        onLogin(id, username, password)
+        login(id, username, password)
         // navigate('/mia')
     }
 

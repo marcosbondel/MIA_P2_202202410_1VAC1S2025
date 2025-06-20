@@ -14,6 +14,11 @@ export const appReducer = ( state, action) => {
                 showError: action.payload.error != "",
                 error: action.payload.error
             }
+        case 'logged[set]':
+            return {
+                ...state,
+                logged: action.payload.logged
+            }
         default:
             break;
     }

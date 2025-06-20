@@ -43,6 +43,31 @@ func login(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 }
+
+func logout(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	if !user.Logout() {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(models.LoginResponse{
+			Status:  "fail",
+			Message: "Failed to log out. User not logged in or partition not mounted.",
+		})
+	} else {
+		// Código 200 OK
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(models.LoginResponse{
+			Status:  "success",
+			Message: "Successfully logged out.",
+		})
+	}
+
+	// json.NewEncoder(w).Encode(models.LoginResponse{
+	// 	Status:  "success",
+	// 	Message: "Successfully logged out.",
+	// })
+}
+
 func getDisks(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Fetching disks...")
 	w.Header().Set("Content-Type", "application/json")
@@ -62,6 +87,7 @@ func main() {
 	r.HandleFunc("/", getRoot).Methods("GET")
 	r.HandleFunc("/api/disks", getDisks).Methods("GET")
 	r.HandleFunc("/api/auth/login", login).Methods("POST")
+	r.HandleFunc("/api/auth/logout", logout).Methods("POST")
 
 	// CORS setup
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})

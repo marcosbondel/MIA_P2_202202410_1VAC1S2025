@@ -131,14 +131,16 @@ func Login(user string, pass string, id string) bool {
 	return true
 }
 
-func Logout() {
+func Logout() bool {
 	//fmt.Println("======Start LOGOUT======")
 	if global.CurrentUser.Status {
 		global.CurrentUser.ID = ""
 		global.CurrentUser.Status = false
+		return true
 		//fmt.Println("User logged out")
 	} else {
 		//fmt.Println("No user logged in")
+		return false
 	}
 	//fmt.Println("======End LOGOUT======")
 }
