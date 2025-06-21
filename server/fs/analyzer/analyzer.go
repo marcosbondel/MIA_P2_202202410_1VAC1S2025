@@ -41,7 +41,7 @@ func Analyze() {
 
 		command, params := getCommandAndParams(line)
 		fmt.Printf("Command: %s, Params: %s\n", command, params)
-		AnalyzeCommnad(command, params)
+		// AnalyzeCommnad(command, params, )
 	}
 }
 
@@ -55,16 +55,35 @@ func getCommandAndParams(input string) (string, string) {
 	return "", input
 }
 
-func AnalyzeCommnad(command string, params string) {
+// func analyzeHTTPInput(input string) (string, string) {
+// 	parts := strings.Fields(input)
+// 	if len(parts) > 0 {
+// 		command := strings.ToLower(parts[0])
+// 		params := strings.Join(parts[1:], " ")
+// 		return command, params
+// 	}
+// 	return "", input
+// }
+
+func AnalyzeHTTPInput(input string) string {
+	buffer_response := "\n"
+	command, params := getCommandAndParams(input)
+
+	AnalyzeCommnad(command, params, &buffer_response)
+
+	return buffer_response
+}
+
+func AnalyzeCommnad(command string, params string, buffer_response *string) {
 	switch command {
 	case "mkdisk":
-		fn_mkdisk(params)
+		fn_mkdisk(params, buffer_response)
 	case "fdisk":
-		fn_fdisk(params)
+		fn_fdisk(params, buffer_response)
 	case "rmdisk":
-		fn_rmdisk(params)
+		fn_rmdisk(params, buffer_response)
 	case "mount":
-		fn_mount(params)
+		fn_mount(params, buffer_response)
 	case "unmount":
 		fn_unmount(params)
 	case "mkfs":
@@ -94,7 +113,7 @@ func AnalyzeCommnad(command string, params string) {
 	case "rep":
 		fn_rep(params)
 	case "execute":
-		fn_execute(params)
+		fn_execute(params, buffer_response)
 	case "exit":
 		fmt.Println("Exiting the program.")
 		os.Exit(0)
@@ -103,7 +122,7 @@ func AnalyzeCommnad(command string, params string) {
 	}
 }
 
-func fn_mount(params string) {
+func fn_mount(params string, buffer_response *string) {
 	// Define flags
 	fs := flag.NewFlagSet("mount", flag.ExitOnError)
 	name := fs.String("driveletter", "", "Letter of the drive")
@@ -113,7 +132,7 @@ func fn_mount(params string) {
 	managementFlags(fs, params)
 
 	// Call the function
-	disk_management.Mount(*name, *path)
+	disk_management.Mount(*name, *path, buffer_response)
 }
 
 func fn_unmount(params string) {
@@ -143,7 +162,7 @@ func fn_unmount(params string) {
 	disk_management.Unmount(*id_partition)
 }
 
-func fn_fdisk(params string) {
+func fn_fdisk(params string, buffer_response *string) {
 	// Define flags
 	// fs := flag.NewFlagSet("mkdisk", flag.ExitOnError)
 	// size := fs.Int("size", 0, "Size")
@@ -166,10 +185,10 @@ func fn_fdisk(params string) {
 	managementFlags(fs, params)
 
 	// Call the function
-	disk_management.Fdisk(*size, *driveLetter, *name, *type_, *fit, *unit, *add_, *delete)
+	disk_management.Fdisk(*size, *driveLetter, *name, *type_, *fit, *unit, *add_, *delete, buffer_response)
 }
 
-func fn_mkdisk(params string) {
+func fn_mkdisk(params string, buffer_response *string) {
 	// Define flags
 	fs := flag.NewFlagSet("mkdisk", flag.ExitOnError)
 	size := fs.Int("size", 0, "Size")
@@ -180,7 +199,7 @@ func fn_mkdisk(params string) {
 	managementFlags(fs, params)
 
 	// Call the function
-	disk_management.Mkdisk(*size, *fit, *unit)
+	disk_management.Mkdisk(*size, *fit, *unit, buffer_response)
 
 }
 
@@ -221,7 +240,7 @@ func contains(slice []string, item string) bool {
 	return false
 }
 
-func fn_rmdisk(params string) {
+func fn_rmdisk(params string, buffer_response *string) {
 
 	// Define flags
 	fs := flag.NewFlagSet("rmdisk", flag.ExitOnError)
@@ -242,10 +261,11 @@ func fn_rmdisk(params string) {
 			fs.Set(flagName, flagValue)
 		default:
 			fmt.Println("Error: Flag not found")
+			*buffer_response += fmt.Sprintf("Error: Flag not found: %s\n", flagName)
 		}
 	}
 
-	disk_management.Rmdisk(*driveLetter)
+	disk_management.Rmdisk(*driveLetter, buffer_response)
 }
 
 func fn_mkfs(input string) {
@@ -399,37 +419,42 @@ func fn_rep(params string) {
 	reports_generator.GenerarReporte(*name, *path, *id, *ruta)
 }
 
-func fn_execute(params string) {
+func fn_execute(params string, buffer_string *string) {
 	flagSet := flag.NewFlagSet("execute", flag.ContinueOnError)
 	path := flagSet.String("path", "", "Ruta del archivo .sdaa")
 
 	args := strings.Fields(params)
 	if err := flagSet.Parse(args); err != nil {
 		fmt.Println("Error:", err)
+		// buffer_string += "Error: " + err.Error() + "\n"
 		return
 	}
 
 	if *path == "" {
 		fmt.Println("ERROR: Falta parámetro -path")
+		// buffer_string += "ERROR: Falta parámetro -path\n"
 		return
 	}
 
 	file, err := os.ReadFile(*path)
 	if err != nil {
 		fmt.Println("ERROR: No se pudo leer el archivo:", *path)
+		// buffer_string += "ERROR: No se pudo leer el archivo: " + *path + "\n"
 		return
 	}
 
 	lines := strings.Split(string(file), "\n")
 	fmt.Println("===Start===")
+	// buffer_string += "===Start===\n"
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
 		fmt.Println("Executing Line:", line)
+		// buffer_string += "Executing Line: " + line + "\n"
 		command, params := getCommandAndParams(line)
-		AnalyzeCommnad(command, params) // Ejecuta el comando
+		AnalyzeCommnad(command, params, buffer_string) // Ejecuta el comando
 	}
 	fmt.Println("===End===")
 }

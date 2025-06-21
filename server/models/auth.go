@@ -6,6 +6,10 @@ type LoginRequest struct {
 	Id   string `json:"id"`
 }
 
+type ExecuteStringRequest struct {
+	CommandString string `json:"command_string"`
+}
+
 type LoginResponse struct {
 	Message string `json:"message"`
 	Status  string `json:"status"`

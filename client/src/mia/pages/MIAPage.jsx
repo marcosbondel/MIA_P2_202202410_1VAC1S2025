@@ -1,7 +1,8 @@
 import { MIALayout } from "../layout/MIALayout";
 import { Card, CardActions, CardContent, Container, Grid, Toolbar, Typography } from "@mui/material";
+// import { MIARoutes } from "../routes/MIARoutes";
 
-export const MIAPage = () => {
+export const MIAPage = ({children}) => {
 
     const disks = [
         { name: "C", size: "500GB" },
@@ -15,54 +16,34 @@ export const MIAPage = () => {
     ]
 
     return (
-        <>
-            <Toolbar></Toolbar>
-            <MIALayout>
-                {/* <Grid 
-                container
-                // sx={{ mr: 2, ml: 2, mt: 2, mb: 2 }}
-                > */}
-                    <Container>
-                        <h1>My Disks</h1>
-
-                        <Grid
-                            container
-                            spacing={2}
-                            direction="row"
-                            justifyContent="space-between"
-                            alignItems="center"
-                        >
-                            { disks.map((disk) => (
-                                <Grid key={disk.name} item xs={12} sm={6} md={4} lg={3}>
-                                    <Card sx={{ minWidth: 275 }}>
-                                        <CardContent>
-                                            <Typography>Disk</Typography>
-                                            <Typography variant="h5" align="center">{ disk.name }</Typography>
-                                        </CardContent>
-                                        <CardActions>
-                                            <Typography variant="body2">Size: { disk.size }</Typography>
-                                        </CardActions>
-                                    </Card>
-                                </Grid>
-                            ))}
-
-                            {/* <Card sx={{ minWidth: 275 }}>
-                                <CardContent>
-                                    <Typography>Disco</Typography>
-                                    <Typography variant="h5">C</Typography>
-                                </CardContent>
-                            </Card>
+        <MIALayout>
+            {/* <MIARoutes/> */}
+            <Container>
+                <Toolbar/>
+                <h1>My Disks</h1>
+                { children }
+                <Grid
+                    container
+                    spacing={2}
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                >
+                    { disks.map((disk) => (
+                        <Grid key={disk.name} item xs={12} sm={6} md={4} lg={3}>
                             <Card sx={{ minWidth: 275 }}>
                                 <CardContent>
-                                    <Typography>Disco</Typography>
-                                    <Typography variant="h5">C</Typography>
+                                    <Typography>Disk</Typography>
+                                    <Typography variant="h5" align="center">{ disk.name }</Typography>
                                 </CardContent>
-                            </Card> */}
-
+                                <CardActions>
+                                    <Typography variant="body2">Size: { disk.size }</Typography>
+                                </CardActions>
+                            </Card>
                         </Grid>
-                    </Container>
-                {/* </Grid> */}
-            </MIALayout>
-        </>
+                    ))}
+                </Grid>
+            </Container>
+        </MIALayout>
     )
 }

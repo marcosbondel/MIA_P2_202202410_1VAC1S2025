@@ -8,16 +8,21 @@ import (
 	"strings"
 )
 
-func Mount(driveLetter string, name string) {
+func Mount(driveLetter string, name string, buffer_string *string) {
 	fmt.Println("======Start MOUNT======")
 	fmt.Println("Drive Letter:", driveLetter)
 	fmt.Println("Name:", name)
+
+	*buffer_string += "======Start MOUNT======\n"
+	*buffer_string += fmt.Sprintf("Drive Letter: %s\n", driveLetter)
+	*buffer_string += fmt.Sprintf("Name: %s\n", name)
 
 	// Open bin file
 	filepath := "./test/" + strings.ToUpper(driveLetter) + ".bin"
 	file, err := utils.OpenFile(filepath)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
+		*buffer_string += fmt.Sprintf("Error opening file: %s\n", err)
 		return
 	}
 
@@ -25,6 +30,7 @@ func Mount(driveLetter string, name string) {
 	// Read MRB from file
 	if err := utils.ReadObject(file, &tempMBR, 0); err != nil {
 		fmt.Println("Error reading MRB from file:", err)
+		*buffer_string += fmt.Sprintf("Error reading MRB from file: %s\n", err)
 		return
 	}
 
@@ -40,6 +46,7 @@ func Mount(driveLetter string, name string) {
 		if strings.Contains(string(tempMBR.Partitions[i].Name[:]), name) {
 			if tempMBR.Partitions[i].Id != emptyId {
 				fmt.Println("Error: Partition with name", name, "already mounted")
+				*buffer_string += fmt.Sprintf("Error: Partition with name %s already mounted\n", name)
 				return
 			}
 			index = i
@@ -51,9 +58,12 @@ func Mount(driveLetter string, name string) {
 
 	if index != -1 {
 		fmt.Println("Partition found:")
+		*buffer_string += fmt.Sprintf("Partition found\n")
 		structs.PrintPartition(tempMBR.Partitions[index])
+		*buffer_string += fmt.Sprintf("Partition ID: %s\n", string(tempMBR.Partitions[index].Id[:]))
 	} else {
 		fmt.Println("Error: Partition with name", name, "not found")
+		*buffer_string += fmt.Sprintf("Error: Partition with name %s not found\n", name)
 		return
 	}
 
@@ -68,15 +78,20 @@ func Mount(driveLetter string, name string) {
 	// Overwrite the MRB in the file
 	if err := utils.WriteObject(file, tempMBR, 0); err != nil {
 		fmt.Println("Error writing MRB to file:", err)
+		*buffer_string += fmt.Sprintf("Error writing MRB to file: %s\n", err)
 		return
 	}
 
 	// Print the updated partition
 	fmt.Println("Updated Partition:")
+	*buffer_string += "Updated Partition\n"
 	structs.PrintPartition(tempMBR.Partitions[index])
+	*buffer_string += fmt.Sprintf("Partition ID: %s\n", string(tempMBR.Partitions[index].Id[:]))
 
 	// Close the bin file
 	defer file.Close()
+
+	*buffer_string += "======End MOUNT======\n"
 
 	fmt.Println("======End MOUNT======")
 }
@@ -133,7 +148,7 @@ func Unmount(id string) {
 	fmt.Println("======End UNMOUNT======")
 }
 
-func Fdisk(size int, driveLetter string, name string, type_ string, fit string, unit string, add int, delete string) {
+func Fdisk(size int, driveLetter string, name string, type_ string, fit string, unit string, add int, delete string, buffer_string *string) {
 	fmt.Println("======Start FDISK======")
 	fmt.Println("Size:", size)
 	fmt.Println("Drive Letter:", driveLetter)
@@ -142,6 +157,14 @@ func Fdisk(size int, driveLetter string, name string, type_ string, fit string, 
 	fmt.Println("Fit:", fit)
 	fmt.Println("Unit:", unit)
 
+	*buffer_string += "======Start FDISK======\n"
+	*buffer_string += fmt.Sprintf("Size: %d\n", size)
+	*buffer_string += fmt.Sprintf("Drive Letter: %s\n", driveLetter)
+	*buffer_string += fmt.Sprintf("Name: %s\n", name)
+	*buffer_string += fmt.Sprintf("Type: %s\n", type_)
+	*buffer_string += fmt.Sprintf("Fit: %s\n", fit)
+	*buffer_string += fmt.Sprintf("Unit: %s\n", unit)
+
 	if fit == "" {
 		fit = "wf" // Default fit if not provided
 	}
@@ -149,18 +172,21 @@ func Fdisk(size int, driveLetter string, name string, type_ string, fit string, 
 	// validate fit equal to b/f/w
 	if fit != "bf" && fit != "ff" && fit != "wf" {
 		fmt.Println("Error: Fit must be b, f, or w")
+		*buffer_string += "Error: Fit must be b, f, or w\n"
 		return
 	}
 
 	// validate size greater than 0
 	if size <= 0 {
 		fmt.Println("Error: Size must be greater than 0")
+		*buffer_string += "Error: Size must be greater than 0\n"
 		return
 	}
 
 	// validate unit equal to k/m
 	if unit != "b" && unit != "k" && unit != "m" {
 		fmt.Println("Error: Unit must be b or k or m")
+		*buffer_string += "Error: Unit must be b or k or m\n"
 		return
 	}
 
@@ -176,6 +202,7 @@ func Fdisk(size int, driveLetter string, name string, type_ string, fit string, 
 	file, err := utils.OpenFile(filepath)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
+		*buffer_string += fmt.Sprintf("Error opening file: %s\n", err)
 		return
 	}
 
@@ -183,6 +210,7 @@ func Fdisk(size int, driveLetter string, name string, type_ string, fit string, 
 	// Read MRB from file
 	if err := utils.ReadObject(file, &tempMBR, 0); err != nil {
 		fmt.Println("Error reading MRB from file:", err)
+		*buffer_string += fmt.Sprintf("Error reading MRB from file: %s\n", err)
 		return
 	}
 
@@ -221,12 +249,14 @@ func Fdisk(size int, driveLetter string, name string, type_ string, fit string, 
 
 	if !foundEmpty {
 		fmt.Println("Error: No empty partition found")
+		*buffer_string += "Error: No empty partition found\n"
 		return
 	}
 
 	// Overwrite the MRB in the file
 	if err := utils.WriteObject(file, tempMBR, 0); err != nil {
 		fmt.Println("Error writing MRB to file:", err)
+		*buffer_string += fmt.Sprintf("Error writing MRB to file: %s\n", err)
 		return
 	}
 
@@ -236,6 +266,7 @@ func Fdisk(size int, driveLetter string, name string, type_ string, fit string, 
 			part := &tempMBR.Partitions[i]
 			if strings.TrimSpace(string(part.Name[:])) == name {
 				fmt.Println("Deleting partition:", name)
+				*buffer_string += fmt.Sprintf("Deleting partition: %s\n", name)
 				part.Size = 0
 				copy(part.Name[:], "")
 				copy(part.Id[:], "")
@@ -247,6 +278,7 @@ func Fdisk(size int, driveLetter string, name string, type_ string, fit string, 
 		}
 		utils.WriteObject(file, tempMBR, 0)
 		fmt.Println("Partition deleted successfully")
+		*buffer_string += "Partition deleted successfully\n"
 		defer file.Close()
 		return
 	}
@@ -307,11 +339,15 @@ func Fdisk(size int, driveLetter string, name string, type_ string, fit string, 
 	fmt.Println("======End FDISK======")
 }
 
-func Mkdisk(size int, fit string, unit string) {
+func Mkdisk(size int, fit string, unit string, buffer_response *string) {
 	fmt.Println("======Start MKDISK======")
 	fmt.Println("Size:", size)
 	fmt.Println("Fit:", fit)
 	fmt.Println("Unit:", unit)
+	*buffer_response += "======Start MKDISK======\n"
+	*buffer_response += fmt.Sprintf("Size: %d\n", size)
+	*buffer_response += fmt.Sprintf("Fit: %s\n", fit)
+	*buffer_response += fmt.Sprintf("Unit: %s\n", unit)
 
 	// Validate input
 	if fit == "" {
@@ -320,15 +356,18 @@ func Mkdisk(size int, fit string, unit string) {
 
 	if fit != "bf" && fit != "ff" && fit != "wf" {
 		fmt.Println("Error: Fit must be bf, ff, or wf")
+		*buffer_response += "Error: Fit must be bf, ff, or wf\n"
 		return
 	}
 
 	if size <= 0 {
 		fmt.Println("Error: Size must be greater than 0")
+		*buffer_response += "Error: Size must be greater than 0\n"
 		return
 	}
 	if unit != "k" && unit != "m" {
 		fmt.Println("Error: Unit must be k or m")
+		*buffer_response += "Error: Unit must be k or m\n"
 		return
 	}
 
@@ -336,6 +375,7 @@ func Mkdisk(size int, fit string, unit string) {
 	diskLetter := utils.FindAvailableLetter("./test")
 	if diskLetter == "" {
 		fmt.Println("Error: No more available letters for disks")
+		*buffer_response += "Error: No more available letters for disks\n"
 		return
 	}
 	diskPath := fmt.Sprintf("./test/%s.bin", diskLetter)
@@ -344,6 +384,7 @@ func Mkdisk(size int, fit string, unit string) {
 	err := utils.CreateFile(diskPath)
 	if err != nil {
 		fmt.Println("Error creating file:", err)
+		*buffer_response += fmt.Sprintf("Error creating file: %s\n", err)
 		return
 	}
 
@@ -378,6 +419,7 @@ func Mkdisk(size int, fit string, unit string) {
 
 	if err := utils.WriteObject(file, newMRB, 0); err != nil {
 		fmt.Println("Error writing MRB to file:", err)
+		*buffer_response += fmt.Sprintf("Error writing MRB to file: %s\n", err)
 		return
 	}
 
@@ -385,6 +427,7 @@ func Mkdisk(size int, fit string, unit string) {
 	var tempMBR structs.MRB
 	if err := utils.ReadObject(file, &tempMBR, 0); err != nil {
 		fmt.Println("Error reading MRB from file:", err)
+		*buffer_response += fmt.Sprintf("Error reading MRB from file: %s\n", err)
 		return
 	}
 
@@ -395,17 +438,29 @@ func Mkdisk(size int, fit string, unit string) {
 	fmt.Println("Creation date:", string(tempMBR.CreationDate[:]))
 	fmt.Println("Signature:", tempMBR.Signature)
 
+	*buffer_response += fmt.Sprintf("Disk created: %s\n", diskPath)
+	*buffer_response += fmt.Sprintf("MRB: %+v\n", tempMBR)
+	*buffer_response += fmt.Sprintf("File size: %d\n", size)
+	*buffer_response += fmt.Sprintf("Fit: %s\n", string(tempMBR.Fit[:]))
+	*buffer_response += fmt.Sprintf("Creation date: %s\n", string(tempMBR.CreationDate[:]))
+	*buffer_response += fmt.Sprintf("Signature: %d\n", tempMBR.Signature)
+	*buffer_response += "======End MKDISK======\n"
+
 	defer file.Close()
 	fmt.Println("======End MKDISK======")
 }
 
-func Rmdisk(driveLetter string) {
+func Rmdisk(driveLetter string, buffer_response *string) {
 	fmt.Println("======Start RMDISK======")
 	fmt.Println("Drive letter:", driveLetter)
+
+	*buffer_response += "======Start RMDISK======\n"
+	*buffer_response += fmt.Sprintf("Drive letter: %s\n", driveLetter)
 
 	// Validate drive letter
 	if len(driveLetter) != 1 || driveLetter[0] < 'A' || driveLetter[0] > 'Z' {
 		fmt.Println("Error: Drive letter must be a single uppercase letter from A to Z")
+		*buffer_response += "Error: Drive letter must be a single uppercase letter from A to Z\n"
 		return
 	}
 
@@ -415,9 +470,12 @@ func Rmdisk(driveLetter string) {
 	// Delete the file
 	if err := utils.DeleteFile(filePath); err != nil {
 		fmt.Println("Error deleting file:", err)
+		*buffer_response += fmt.Sprintf("Error deleting file: %s\n", err)
 		return
 	}
 
+	*buffer_response += fmt.Sprintf("Disk %s removed successfully.\n", driveLetter)
+	*buffer_response += "======End RMDISK======\n"
 	fmt.Println("Disk removed successfully.")
 	fmt.Println("======End RMDISK======")
 }

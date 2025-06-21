@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"MIA_P2_202202410_1VAC1S2025/fs/analyzer"
 	"MIA_P2_202202410_1VAC1S2025/fs/user"
 	"MIA_P2_202202410_1VAC1S2025/models"
 
@@ -68,6 +69,24 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	// })
 }
 
+func doExecute(w http.ResponseWriter, r *http.Request) {
+	// Aquí podrías implementar la lógica para ejecutar comandos
+	// Por ahora, simplemente devolvemos un mensaje de ejemplo
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Println("Executing command...")
+
+	var req models.ExecuteStringRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, `{"error":"JSON inválido"}`, http.StatusBadRequest)
+		return
+	}
+
+	response_string := analyzer.AnalyzeHTTPInput(req.CommandString)
+
+	// json.NewEncoder(w).Encode("Command executed successfully.")
+	json.NewEncoder(w).Encode(response_string)
+}
+
 func getDisks(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Fetching disks...")
 	w.Header().Set("Content-Type", "application/json")
@@ -88,6 +107,8 @@ func main() {
 	r.HandleFunc("/api/disks", getDisks).Methods("GET")
 	r.HandleFunc("/api/auth/login", login).Methods("POST")
 	r.HandleFunc("/api/auth/logout", logout).Methods("POST")
+
+	r.HandleFunc("/api/run_command", doExecute).Methods("POST")
 
 	// CORS setup
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
