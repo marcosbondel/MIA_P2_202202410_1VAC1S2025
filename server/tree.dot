@@ -1,0 +1,226 @@
+digraph Tree {
+rankdir=LR;
+node [shape=plaintext fontname="Helvetica"];
+inode0 [label=<
+<table border='1' cellborder='1' cellspacing='0'>
+<tr><td colspan='2'><b>Inodo 0</b></td></tr>
+<tr><td><b>UID</b></td><td>1</td></tr>
+<tr><td><b>GID</b></td><td>1</td></tr>
+<tr><td><b>SIZE</b></td><td>0</td></tr>
+<tr><td><b>TYPE</b></td><td>0</td></tr>
+<tr><td><b>I_BLOCK[0]</b></td><td>0</td></tr>
+<tr><td><b>I_BLOCK[1]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[2]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[3]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[4]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[5]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[6]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[7]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[8]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[9]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[10]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[11]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[12]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[13]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[14]</b></td><td>-1</td></tr>
+</table>>];
+block0 [label=<
+<table border='1' cellborder='1' cellspacing='0'>
+<tr><td colspan='3'><b>FolderBlock 0</b></td></tr>
+<tr><td><b>Index</b></td><td><b>Name</b></td><td><b>Inode Ptr</b></td></tr>
+<tr><td>0</td><td>.</td><td>0</td></tr>
+<tr><td>1</td><td>..</td><td>0</td></tr>
+<tr><td>2</td><td>users.txt</td><td>1</td></tr>
+<tr><td>3</td><td>home</td><td>2</td></tr>
+</table>>];
+inode0 -> block0;
+inode1 [label=<
+<table border='1' cellborder='1' cellspacing='0'>
+<tr><td colspan='2'><b>Inodo 1</b></td></tr>
+<tr><td><b>UID</b></td><td>1</td></tr>
+<tr><td><b>GID</b></td><td>1</td></tr>
+<tr><td><b>SIZE</b></td><td>169</td></tr>
+<tr><td><b>TYPE</b></td><td>1</td></tr>
+<tr><td><b>I_BLOCK[0]</b></td><td>1</td></tr>
+<tr><td><b>I_BLOCK[1]</b></td><td>2</td></tr>
+<tr><td><b>I_BLOCK[2]</b></td><td>3</td></tr>
+<tr><td><b>I_BLOCK[3]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[4]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[5]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[6]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[7]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[8]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[9]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[10]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[11]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[12]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[13]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[14]</b></td><td>-1</td></tr>
+</table>>];
+block1 [label=<
+<table border='1' cellborder='1' cellspacing='0'>
+<tr><td colspan='3'><b>FolderBlock 1</b></td></tr>
+<tr><td><b>Index</b></td><td><b>Name</b></td><td><b>Inode Ptr</b></td></tr>
+<tr><td>0</td><td>1,G,root
+1,U</td><td>1869574700</td></tr>
+<tr><td>1</td><td>t,root,123
+2</td><td>1730955052</td></tr>
+<tr><td>2</td><td>rupo1
+0,G,gr</td><td>846164085</td></tr>
+<tr><td>3</td><td>
+4,G,grupo3
+</td><td>742861872</td></tr>
+</table>>];
+inode1 -> block1;
+block2 [label=<
+<table border='1' cellborder='1' cellspacing='0'>
+<tr><td colspan='3'><b>FolderBlock 2</b></td></tr>
+<tr><td><b>Index</b></td><td><b>Name</b></td><td><b>Inode Ptr</b></td></tr>
+<tr><td>0</td><td>grupo4
+6,G,g</td><td>1869641074</td></tr>
+<tr><td>1</td><td>5
+0,G,grupo6</td><td>1194080266</td></tr>
+<tr><td>2</td><td>,grupo7
+0,G,</td><td>1886745191</td></tr>
+<tr><td>3</td><td>o8
+10,G,grup</td><td>839530863</td></tr>
+</table>>];
+inode1 -> block2;
+block3 [label=<
+<table border='1' cellborder='1' cellspacing='0'>
+<tr><td colspan='3'><b>FolderBlock 3</b></td></tr>
+<tr><td><b>Index</b></td><td><b>Name</b></td><td><b>Inode Ptr</b></td></tr>
+<tr><td>0</td><td>,U,grupo1,us</td><td>741438053</td></tr>
+<tr><td>1</td><td>123
+0,U,grup</td><td>1965830511</td></tr>
+<tr><td>2</td><td>ser2,123
+</td><td>0</td></tr>
+</table>>];
+inode1 -> block3;
+inode2 [label=<
+<table border='1' cellborder='1' cellspacing='0'>
+<tr><td colspan='2'><b>Inodo 2</b></td></tr>
+<tr><td><b>UID</b></td><td>1</td></tr>
+<tr><td><b>GID</b></td><td>1</td></tr>
+<tr><td><b>SIZE</b></td><td>0</td></tr>
+<tr><td><b>TYPE</b></td><td>0</td></tr>
+<tr><td><b>I_BLOCK[0]</b></td><td>4</td></tr>
+<tr><td><b>I_BLOCK[1]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[2]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[3]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[4]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[5]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[6]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[7]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[8]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[9]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[10]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[11]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[12]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[13]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[14]</b></td><td>-1</td></tr>
+</table>>];
+block4 [label=<
+<table border='1' cellborder='1' cellspacing='0'>
+<tr><td colspan='3'><b>FolderBlock 4</b></td></tr>
+<tr><td><b>Index</b></td><td><b>Name</b></td><td><b>Inode Ptr</b></td></tr>
+<tr><td>0</td><td>.</td><td>2</td></tr>
+<tr><td>1</td><td>..</td><td>0</td></tr>
+<tr><td>2</td><td>user</td><td>3</td></tr>
+</table>>];
+inode2 -> block4;
+inode3 [label=<
+<table border='1' cellborder='1' cellspacing='0'>
+<tr><td colspan='2'><b>Inodo 3</b></td></tr>
+<tr><td><b>UID</b></td><td>1</td></tr>
+<tr><td><b>GID</b></td><td>1</td></tr>
+<tr><td><b>SIZE</b></td><td>0</td></tr>
+<tr><td><b>TYPE</b></td><td>0</td></tr>
+<tr><td><b>I_BLOCK[0]</b></td><td>5</td></tr>
+<tr><td><b>I_BLOCK[1]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[2]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[3]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[4]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[5]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[6]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[7]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[8]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[9]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[10]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[11]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[12]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[13]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[14]</b></td><td>-1</td></tr>
+</table>>];
+block5 [label=<
+<table border='1' cellborder='1' cellspacing='0'>
+<tr><td colspan='3'><b>FolderBlock 5</b></td></tr>
+<tr><td><b>Index</b></td><td><b>Name</b></td><td><b>Inode Ptr</b></td></tr>
+<tr><td>0</td><td>.</td><td>3</td></tr>
+<tr><td>1</td><td>..</td><td>2</td></tr>
+<tr><td>2</td><td>docs</td><td>4</td></tr>
+</table>>];
+inode3 -> block5;
+inode4 [label=<
+<table border='1' cellborder='1' cellspacing='0'>
+<tr><td colspan='2'><b>Inodo 4</b></td></tr>
+<tr><td><b>UID</b></td><td>1</td></tr>
+<tr><td><b>GID</b></td><td>1</td></tr>
+<tr><td><b>SIZE</b></td><td>0</td></tr>
+<tr><td><b>TYPE</b></td><td>0</td></tr>
+<tr><td><b>I_BLOCK[0]</b></td><td>6</td></tr>
+<tr><td><b>I_BLOCK[1]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[2]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[3]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[4]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[5]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[6]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[7]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[8]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[9]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[10]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[11]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[12]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[13]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[14]</b></td><td>-1</td></tr>
+</table>>];
+block6 [label=<
+<table border='1' cellborder='1' cellspacing='0'>
+<tr><td colspan='3'><b>FolderBlock 6</b></td></tr>
+<tr><td><b>Index</b></td><td><b>Name</b></td><td><b>Inode Ptr</b></td></tr>
+<tr><td>0</td><td>.</td><td>4</td></tr>
+<tr><td>1</td><td>..</td><td>3</td></tr>
+<tr><td>2</td><td>a.txt</td><td>5</td></tr>
+</table>>];
+inode4 -> block6;
+inode5 [label=<
+<table border='1' cellborder='1' cellspacing='0'>
+<tr><td colspan='2'><b>Inodo 5</b></td></tr>
+<tr><td><b>UID</b></td><td>1</td></tr>
+<tr><td><b>GID</b></td><td>1</td></tr>
+<tr><td><b>SIZE</b></td><td>15</td></tr>
+<tr><td><b>TYPE</b></td><td>1</td></tr>
+<tr><td><b>I_BLOCK[0]</b></td><td>7</td></tr>
+<tr><td><b>I_BLOCK[1]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[2]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[3]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[4]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[5]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[6]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[7]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[8]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[9]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[10]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[11]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[12]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[13]</b></td><td>-1</td></tr>
+<tr><td><b>I_BLOCK[14]</b></td><td>-1</td></tr>
+</table>>];
+block7 [label=<
+<table border='1' cellborder='1' cellspacing='0'>
+<tr><td colspan='3'><b>FolderBlock 7</b></td></tr>
+<tr><td><b>Index</b></td><td><b>Name</b></td><td><b>Inode Ptr</b></td></tr>
+<tr><td>0</td><td>000000000000</td><td>3158064</td></tr>
+</table>>];
+inode5 -> block7;
+}

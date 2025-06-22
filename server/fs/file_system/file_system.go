@@ -9,14 +9,19 @@ import (
 	"strings"
 )
 
-func Mkfs(id string, type_ string, fs_ string) {
+func Mkfs(id string, type_ string, fs_ string, buffer_string *string) {
 	fmt.Println("======Start MKFS======")
 	fmt.Println("Id:", id)
 	fmt.Println("Type:", type_)
 	fmt.Println("Fs:", fs_)
 
+	*buffer_string += "======Start MKFS======\n"
+	*buffer_string += "Id: " + id + "\n"
+	*buffer_string += "Type: " + type_ + "\n"
+	*buffer_string += "Fs: " + fs_ + "\n"
+
 	driveletter := string(id[0])
-	filepath := "./test/" + strings.ToUpper(driveletter) + ".bin"
+	filepath := "./fs/test/" + strings.ToUpper(driveletter) + ".bin"
 	file, err := utils.OpenFile(filepath)
 	if err != nil {
 		return
@@ -39,6 +44,7 @@ func Mkfs(id string, type_ string, fs_ string) {
 	}
 	if index == -1 {
 		fmt.Println("Partition not found")
+		*buffer_string += "Partition not found\n"
 		return
 	}
 
@@ -50,6 +56,7 @@ func Mkfs(id string, type_ string, fs_ string) {
 	}
 	n := int32(numerador / (denrominador_base + temp))
 	fmt.Println("N:", n)
+	*buffer_string += fmt.Sprintf("N: %d\n", n)
 
 	var newSuperblock structs.Superblock
 	newSuperblock.S_inodes_count = n
@@ -61,16 +68,19 @@ func Mkfs(id string, type_ string, fs_ string) {
 	newSuperblock.S_mnt_count = 0
 
 	if fs_ == "2fs" {
-		create_ext2(n, TempMBR.Partitions[index], newSuperblock, "16/06/2025", file)
+		create_ext2(n, TempMBR.Partitions[index], newSuperblock, "16/06/2025", file, buffer_string)
 	} else {
 		create_ext3(n, TempMBR.Partitions[index], newSuperblock, "16/06/2025", file)
 	}
 
+	*buffer_string += "======End MKFS======\n"
 	fmt.Println("======End MKFS======")
 }
 
-func create_ext2(n int32, partition structs.Partition, sb structs.Superblock, date string, file *os.File) {
+func create_ext2(n int32, partition structs.Partition, sb structs.Superblock, date string, file *os.File, buffer_string *string) {
 	fmt.Println("======Start CREATE EXT2======")
+	*buffer_string += "======Start CREATE EXT2======\n"
+
 	sb.S_filesystem_type = 2
 	sb.S_bm_inode_start = partition.Start + int32(binary.Size(structs.Superblock{}))
 	sb.S_bm_block_start = sb.S_bm_inode_start + n
@@ -152,6 +162,7 @@ func create_ext2(n int32, partition structs.Partition, sb structs.Superblock, da
 	utils.WriteObject(file, folderBlock0, int64(sb.S_block_start))
 	utils.WriteObject(file, fileBlock1, int64(sb.S_block_start+int32(binary.Size(fileBlock1))))
 
+	*buffer_string += "======End CREATE EXT2======\n"
 	fmt.Println("======End CREATE EXT2======")
 }
 

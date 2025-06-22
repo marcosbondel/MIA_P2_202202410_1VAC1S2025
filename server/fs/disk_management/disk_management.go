@@ -18,7 +18,7 @@ func Mount(driveLetter string, name string, buffer_string *string) {
 	*buffer_string += fmt.Sprintf("Name: %s\n", name)
 
 	// Open bin file
-	filepath := "./test/" + strings.ToUpper(driveLetter) + ".bin"
+	filepath := "./fs/test/" + strings.ToUpper(driveLetter) + ".bin"
 	file, err := utils.OpenFile(filepath)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
@@ -96,15 +96,19 @@ func Mount(driveLetter string, name string, buffer_string *string) {
 	fmt.Println("======End MOUNT======")
 }
 
-func Unmount(id string) {
+func Unmount(id string, buffer_string *string) {
 	fmt.Println("======Start UNMOUNT======")
 	fmt.Println("ID:", id)
 
+	*buffer_string += "======Start UNMOUNT======\n"
+	*buffer_string += fmt.Sprintf("ID: %s\n", id)
+
 	// Open bin file
-	filepath := "./test/" + strings.ToUpper(id[:1]) + ".bin"
+	filepath := "./fs/test/" + strings.ToUpper(id[:1]) + ".bin"
 	file, err := utils.OpenFile(filepath)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
+		*buffer_string += fmt.Sprintf("Error opening file: %s\n", err)
 		return
 	}
 
@@ -112,6 +116,7 @@ func Unmount(id string) {
 	// Read MRB from file
 	if err := utils.ReadObject(file, &tempMBR, 0); err != nil {
 		fmt.Println("Error reading MRB from file:", err)
+		*buffer_string += fmt.Sprintf("Error reading MRB from file: %s\n", err)
 		return
 	}
 
@@ -130,20 +135,25 @@ func Unmount(id string) {
 
 	if !found {
 		fmt.Println("Error: Partition with id", id, "not found")
+		*buffer_string += fmt.Sprintf("Error: Partition with id %s not found\n", id)
 		return
 	}
 
 	// Overwrite the MRB in the file
 	if err := utils.WriteObject(file, tempMBR, 0); err != nil {
 		fmt.Println("Error writing MRB to file:", err)
+		*buffer_string += fmt.Sprintf("Error writing MRB to file: %s\n", err)
 		return
 	}
 
 	fmt.Println("Partition with id", id, "unmounted successfully.")
+	*buffer_string += fmt.Sprintf("Partition with id %s unmounted successfully.\n", id)
 	structs.PrintMBR(tempMBR)
 	// Close the bin file
 	defer file.Close()
 
+	*buffer_string += "Unmount operation completed successfully.\n"
+	*buffer_string += "======End UNMOUNT======\n"
 	fmt.Println("Unmount operation completed successfully.")
 	fmt.Println("======End UNMOUNT======")
 }
@@ -198,7 +208,7 @@ func Fdisk(size int, driveLetter string, name string, type_ string, fit string, 
 	}
 
 	// Open bin file
-	filepath := "./test/" + strings.ToUpper(driveLetter) + ".bin"
+	filepath := "./fs/test/" + strings.ToUpper(driveLetter) + ".bin"
 	file, err := utils.OpenFile(filepath)
 	if err != nil {
 		fmt.Println("Error opening file:", err)

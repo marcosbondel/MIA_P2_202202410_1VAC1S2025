@@ -26,6 +26,7 @@ export const TerminalPage = () => {
         setLines((prev) => [...prev, `$ ${command}`, data.output]);
         console.log(`Command executed: ${command}`);
         console.log(`Command output: ${data}`);
+        return data
     }
 
     const handleCommand = async(cmd) => {
@@ -42,7 +43,7 @@ export const TerminalPage = () => {
                 output = "";
                 break;
             default:
-                await runCommand(cmd);
+                output = await runCommand(cmd);
                 // output = `Command not found: ${cmd}`;
         }
 

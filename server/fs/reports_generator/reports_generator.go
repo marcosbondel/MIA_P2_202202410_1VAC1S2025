@@ -14,30 +14,30 @@ import (
 	"strings"
 )
 
-func GenerarReporte(name string, path string, id string, ruta string) {
+func GenerarReporte(name string, path string, id string, ruta string, buffer_string *string) {
 	switch name {
 	case "mbr":
-		GenerarReporteMBR(path, id)
+		GenerarReporteMBR(path, id, buffer_string)
 	// case "tree":
 	// 	GenerarReporteTrees(path, id)
 	case "disk":
-		GenerarReporteDISK(path, id)
+		GenerarReporteDISK(path, id, buffer_string)
 	case "inode":
-		GenerarReporteINODE(path, id)
+		GenerarReporteINODE(path, id, buffer_string)
 	case "bm_inode":
-		GenerarReporteBMInode(path, id)
+		GenerarReporteBMInode(path, id, buffer_string)
 	case "bm_bloc":
-		GenerarReporteBMBlock(path, id)
+		GenerarReporteBMBlock(path, id, buffer_string)
 	case "tree":
-		GenerarReporteTREE(path, id)
+		GenerarReporteTREE(path, id, buffer_string)
 	case "block":
-		GenerarReporteBlock(path, id)
+		GenerarReporteBlock(path, id, buffer_string)
 	case "sb":
-		GenerarReporteSB(path, id)
+		GenerarReporteSB(path, id, buffer_string)
 	case "file":
-		GenerarReporteFile(id, path, ruta)
+		GenerarReporteFile(id, path, ruta, buffer_string)
 	case "ls":
-		GenerarReporteLS(id, path, ruta)
+		GenerarReporteLS(id, path, ruta, buffer_string)
 	default:
 		fmt.Println("ERROR: Reporte no reconocido:", name)
 	}
@@ -69,13 +69,14 @@ func GenerarReporteTree1(path string, id string) {
 
 // =================== REPORTE MBR ===================
 
-func GenerarReporteMBR(path string, id string) {
+func GenerarReporteMBR(path string, id string, buffer_string *string) {
 	driveLetter := string(id[0])
-	filepath := "./test/" + strings.ToUpper(driveLetter) + ".bin"
+	filepath := "./fs/test/" + strings.ToUpper(driveLetter) + ".bin"
 
 	file, err := utils.OpenFile(filepath)
 	if err != nil {
 		fmt.Println("Error al abrir disco:", err)
+		*buffer_string += "Error al abrir disco: " + err.Error() + "\n"
 		return
 	}
 	defer file.Close()
@@ -83,6 +84,7 @@ func GenerarReporteMBR(path string, id string) {
 	var mbr structs.MRB
 	if err := utils.ReadObject(file, &mbr, 0); err != nil {
 		fmt.Println("Error al leer MBR:", err)
+		*buffer_string += "Error al leer MBR: " + err.Error() + "\n"
 		return
 	}
 
@@ -121,6 +123,7 @@ func GenerarReporteMBR(path string, id string) {
 			for next != -1 {
 				if visited[next] {
 					fmt.Println("⚠️  Detenido: ciclo detectado en lista de EBRs")
+					*buffer_string += "⚠️  Detenido: ciclo detectado en lista de EBRs\n"
 					break
 				}
 				visited[next] = true
@@ -128,6 +131,7 @@ func GenerarReporteMBR(path string, id string) {
 				var ebr structs.EBR
 				if err := utils.ReadObject(file, &ebr, int64(next)); err != nil {
 					fmt.Println("Error al leer EBR:", err)
+					*buffer_string += "Error al leer EBR: " + err.Error() + "\n"
 					break
 				}
 
@@ -160,21 +164,24 @@ func GenerarReporteMBR(path string, id string) {
 	dotPath := "mbr.dot"
 	if err := os.WriteFile(dotPath, []byte(dot.String()), 0644); err != nil {
 		fmt.Println("Error al escribir archivo DOT:", err)
+		*buffer_string += "Error al escribir archivo DOT: " + err.Error() + "\n"
 		return
 	}
 
 	cmd := exec.Command("dot", "-Tpng", dotPath, "-o", path)
 	if err := cmd.Run(); err != nil {
 		fmt.Println("Error ejecutando Graphviz:", err)
+		*buffer_string += "Error ejecutando Graphviz: " + err.Error() + "\n"
 		return
 	}
 
+	*buffer_string += "Reporte MBR generado exitosamente: " + path + "\n"
 	fmt.Println("✅ Reporte MBR generado exitosamente:", path)
 }
 
 // func GenerarReporteDISK(path string, id string) {
 // 	driveLetter := string(id[0])
-// 	filepath := "./test/" + strings.ToUpper(driveLetter) + ".bin"
+// 	filepath := "./fs/test/" + strings.ToUpper(driveLetter) + ".bin"
 
 // 	file, err := utils.OpenFile(filepath)
 // 	if err != nil {
@@ -292,13 +299,14 @@ func GenerarReporteMBR(path string, id string) {
 // 	fmt.Println("Reporte DISK generado exitosamente:", path)
 // }
 
-func GenerarReporteDISK(path string, id string) {
+func GenerarReporteDISK(path string, id string, buffer_string *string) {
 	driveLetter := string(id[0])
-	filepath := "./test/" + strings.ToUpper(driveLetter) + ".bin"
+	filepath := "./fs/test/" + strings.ToUpper(driveLetter) + ".bin"
 
 	file, err := utils.OpenFile(filepath)
 	if err != nil {
 		fmt.Println("Error al abrir disco:", err)
+		*buffer_string += "Error al abrir disco: " + err.Error() + "\n"
 		return
 	}
 	defer file.Close()
@@ -306,6 +314,7 @@ func GenerarReporteDISK(path string, id string) {
 	var mbr structs.MRB
 	if err := utils.ReadObject(file, &mbr, 0); err != nil {
 		fmt.Println("Error al leer MBR:", err)
+		*buffer_string += "Error al leer MBR: " + err.Error() + "\n"
 		return
 	}
 
@@ -398,6 +407,7 @@ func GenerarReporteDISK(path string, id string) {
 	dotPath := "disk.dot"
 	if err := os.WriteFile(dotPath, []byte(dot.String()), 0644); err != nil {
 		fmt.Println("Error al escribir archivo DOT:", err)
+		*buffer_string += "Error al escribir archivo DOT: " + err.Error() + "\n"
 		return
 	}
 
@@ -405,25 +415,30 @@ func GenerarReporteDISK(path string, id string) {
 	cmd := exec.Command("dot", "-Tpng", dotPath, "-o", path)
 	if err := cmd.Run(); err != nil {
 		fmt.Println("Error ejecutando Graphviz:", err)
+		*buffer_string += "Error ejecutando Graphviz: " + err.Error() + "\n"
 		return
 	}
 
+	*buffer_string += "Reporte DISK generado exitosamente: " + path + "\n"
 	fmt.Println("Reporte DISK generado exitosamente:", path)
 }
 
-func GenerarReporteINODE(path string, id string) {
+func GenerarReporteINODE(path string, id string, buffer_string *string) {
 	fmt.Println("======Start REP INODE======")
+	*buffer_string += "======Start REP INODE======\n"
 
 	if !global.CurrentUser.Status {
 		fmt.Println("ERROR: Debes iniciar sesión.")
+		*buffer_string += "ERROR: Debes iniciar sesión.\n"
 		return
 	}
 
 	driveLetter := string(id[0])
-	filepath := "./test/" + strings.ToUpper(driveLetter) + ".bin"
+	filepath := "./fs/test/" + strings.ToUpper(driveLetter) + ".bin"
 	file, err := utils.OpenFile(filepath)
 	if err != nil {
 		fmt.Println("ERROR: No se pudo abrir el disco.")
+		*buffer_string += "ERROR: No se pudo abrir el disco.\n"
 		return
 	}
 	defer file.Close()
@@ -431,12 +446,14 @@ func GenerarReporteINODE(path string, id string) {
 	var mbr structs.MRB
 	if err := utils.ReadObject(file, &mbr, 0); err != nil {
 		fmt.Println("ERROR: No se pudo leer el MBR.")
+		*buffer_string += "ERROR: No se pudo leer el MBR.\n"
 		return
 	}
 
 	index := int(id[1] - '1')
 	if index < 0 || index >= 4 {
 		fmt.Println("ERROR: Índice fuera de rango.")
+		*buffer_string += "ERROR: Índice fuera de rango.\n"
 		return
 	}
 
@@ -444,6 +461,7 @@ func GenerarReporteINODE(path string, id string) {
 	sb := structs.Superblock{}
 	if err := utils.ReadObject(file, &sb, int64(part.Start)); err != nil {
 		fmt.Println("ERROR: No se pudo leer el Superbloque.")
+		*buffer_string += "ERROR: No se pudo leer el Superbloque.\n"
 		return
 	}
 
@@ -495,6 +513,7 @@ func GenerarReporteINODE(path string, id string) {
 	dotPath := "inode.dot"
 	if err := os.WriteFile(dotPath, []byte(dot.String()), 0644); err != nil {
 		fmt.Println("ERROR: No se pudo guardar el archivo DOT.")
+		*buffer_string += "ERROR: No se pudo guardar el archivo DOT.\n"
 		return
 	}
 
@@ -502,23 +521,27 @@ func GenerarReporteINODE(path string, id string) {
 	cmd := exec.Command("dot", "-Tpng", dotPath, "-o", path)
 	if err := cmd.Run(); err != nil {
 		fmt.Println("ERROR ejecutando Graphviz:", err)
+		*buffer_string += "ERROR ejecutando Graphviz: " + err.Error() + "\n"
 		return
 	}
 
 	fmt.Println("Reporte INODE generado exitosamente:", path)
+	*buffer_string += "Reporte INODE generado exitosamente: " + path + "\n"
 }
 
-func GenerarReporteBMInode(path string, id string) {
+func GenerarReporteBMInode(path string, id string, buffer_string *string) {
 	if !global.CurrentUser.Status {
 		fmt.Println("ERROR: No hay sesión activa.")
+		*buffer_string += "ERROR: No hay sesión activa.\n"
 		return
 	}
 
 	driveLetter := string(id[0])
-	filepath := "./test/" + strings.ToUpper(driveLetter) + ".bin"
+	filepath := "./fs/test/" + strings.ToUpper(driveLetter) + ".bin"
 	file, err := utils.OpenFile(filepath)
 	if err != nil {
 		fmt.Println("ERROR: No se pudo abrir el archivo binario.")
+		*buffer_string += "ERROR: No se pudo abrir el archivo binario.\n"
 		return
 	}
 	defer file.Close()
@@ -526,18 +549,21 @@ func GenerarReporteBMInode(path string, id string) {
 	var mbr structs.MRB
 	if err := utils.ReadObject(file, &mbr, 0); err != nil {
 		fmt.Println("ERROR: No se pudo leer el MBR.")
+		*buffer_string += "ERROR: No se pudo leer el MBR.\n"
 		return
 	}
 
 	index := int(id[1] - '1')
 	if index < 0 || index >= 4 {
 		fmt.Println("ERROR: Índice fuera de rango.")
+		*buffer_string += "ERROR: Índice fuera de rango.\n"
 		return
 	}
 
 	sb := structs.Superblock{}
 	if err := utils.ReadObject(file, &sb, int64(mbr.Partitions[index].Start)); err != nil {
 		fmt.Println("ERROR: No se pudo leer el Superbloque.")
+		*buffer_string += "ERROR: No se pudo leer el Superbloque.\n"
 		return
 	}
 
@@ -545,6 +571,7 @@ func GenerarReporteBMInode(path string, id string) {
 	bitmap := make([]byte, n)
 	if _, err := file.ReadAt(bitmap, int64(sb.S_bm_inode_start)); err != nil {
 		fmt.Println("ERROR: No se pudo leer el bitmap de inodos.")
+		*buffer_string += "ERROR: No se pudo leer el bitmap de inodos.\n"
 		return
 	}
 
@@ -558,23 +585,27 @@ func GenerarReporteBMInode(path string, id string) {
 
 	if err := os.WriteFile(path, []byte(builder.String()), 0644); err != nil {
 		fmt.Println("ERROR: No se pudo guardar el archivo del reporte.")
+		*buffer_string += "ERROR: No se pudo guardar el archivo del reporte.\n"
 		return
 	}
 
+	*buffer_string += "Reporte bm_inode generado exitosamente: " + path + "\n"
 	fmt.Println("Reporte bm_inode generado exitosamente:", path)
 }
 
-func GenerarReporteBMBlock(path string, id string) {
+func GenerarReporteBMBlock(path string, id string, buffer_string *string) {
 	if !global.CurrentUser.Status {
 		fmt.Println("ERROR: No hay sesión activa.")
+		*buffer_string += "ERROR: No hay sesión activa.\n"
 		return
 	}
 
 	driveLetter := string(id[0])
-	filepath := "./test/" + strings.ToUpper(driveLetter) + ".bin"
+	filepath := "./fs/test/" + strings.ToUpper(driveLetter) + ".bin"
 	file, err := utils.OpenFile(filepath)
 	if err != nil {
 		fmt.Println("ERROR: No se pudo abrir el archivo binario.")
+		*buffer_string += "ERROR: No se pudo abrir el archivo binario.\n"
 		return
 	}
 	defer file.Close()
@@ -582,18 +613,21 @@ func GenerarReporteBMBlock(path string, id string) {
 	var mbr structs.MRB
 	if err := utils.ReadObject(file, &mbr, 0); err != nil {
 		fmt.Println("ERROR: No se pudo leer el MBR.")
+		*buffer_string += "ERROR: No se pudo leer el MBR.\n"
 		return
 	}
 
 	index := int(id[1] - '1')
 	if index < 0 || index >= 4 {
 		fmt.Println("ERROR: Índice fuera de rango.")
+		*buffer_string += "ERROR: Índice fuera de rango.\n"
 		return
 	}
 
 	sb := structs.Superblock{}
 	if err := utils.ReadObject(file, &sb, int64(mbr.Partitions[index].Start)); err != nil {
 		fmt.Println("ERROR: No se pudo leer el Superbloque.")
+		*buffer_string += "ERROR: No se pudo leer el Superbloque.\n"
 		return
 	}
 
@@ -601,6 +635,7 @@ func GenerarReporteBMBlock(path string, id string) {
 	bitmap := make([]byte, n)
 	if _, err := file.ReadAt(bitmap, int64(sb.S_bm_block_start)); err != nil {
 		fmt.Println("ERROR: No se pudo leer el bitmap de bloques.")
+		*buffer_string += "ERROR: No se pudo leer el bitmap de bloques.\n"
 		return
 	}
 
@@ -618,23 +653,27 @@ func GenerarReporteBMBlock(path string, id string) {
 
 	if err := os.WriteFile(path, []byte(builder.String()), 0644); err != nil {
 		fmt.Println("ERROR: No se pudo guardar el archivo del reporte.")
+		*buffer_string += "ERROR: No se pudo guardar el archivo del reporte.\n"
 		return
 	}
 
+	*buffer_string += "Reporte bm_block generado exitosamente: " + path + "\n"
 	fmt.Println("Reporte bm_block generado exitosamente:", path)
 }
 
-func GenerarReporteTREE(path string, id string) {
+func GenerarReporteTREE(path string, id string, buffer_string *string) {
 	if !global.CurrentUser.Status {
 		fmt.Println("ERROR: No hay sesión activa.")
+		*buffer_string += "ERROR: No hay sesión activa.\n"
 		return
 	}
 
 	driveLetter := string(id[0])
-	filePath := "./test/" + strings.ToUpper(driveLetter) + ".bin"
+	filePath := "./fs/test/" + strings.ToUpper(driveLetter) + ".bin"
 	file, err := utils.OpenFile(filePath)
 	if err != nil {
 		fmt.Println("ERROR: No se pudo abrir el archivo binario.")
+		*buffer_string += "ERROR: No se pudo abrir el archivo binario.\n"
 		return
 	}
 	defer file.Close()
@@ -642,18 +681,21 @@ func GenerarReporteTREE(path string, id string) {
 	var mbr structs.MRB
 	if err := utils.ReadObject(file, &mbr, 0); err != nil {
 		fmt.Println("ERROR: No se pudo leer el MBR.")
+		*buffer_string += "ERROR: No se pudo leer el MBR.\n"
 		return
 	}
 
 	index := int(id[1] - '1')
 	if index < 0 || index > 3 {
 		fmt.Println("ERROR: Índice fuera de rango.")
+		*buffer_string += "ERROR: Índice fuera de rango.\n"
 		return
 	}
 
 	var sb structs.Superblock
 	if err := utils.ReadObject(file, &sb, int64(mbr.Partitions[index].Start)); err != nil {
 		fmt.Println("ERROR: No se pudo leer el Superbloque.")
+		*buffer_string += "ERROR: No se pudo leer el Superbloque.\n"
 		return
 	}
 
@@ -725,29 +767,34 @@ func GenerarReporteTREE(path string, id string) {
 	dotPath := "tree.dot"
 	if err := os.WriteFile(dotPath, []byte(dot.String()), 0644); err != nil {
 		fmt.Println("ERROR: No se pudo guardar el archivo .dot.")
+		*buffer_string += "ERROR: No se pudo guardar el archivo .dot.\n"
 		return
 	}
 
 	cmd := exec.Command("dot", "-Tjpg", dotPath, "-o", path)
 	if err := cmd.Run(); err != nil {
 		fmt.Println("Error ejecutando Graphviz:", err)
+		*buffer_string += "ERROR ejecutando Graphviz: " + err.Error() + "\n"
 		return
 	}
 
+	*buffer_string += "Reporte TREE generado exitosamente: " + path + "\n"
 	fmt.Println("Reporte TREE generado exitosamente:", path)
 }
 
-func GenerarReporteBlock(pathSalida string, id string) {
+func GenerarReporteBlock(pathSalida string, id string, buffer_string *string) {
 	if !global.CurrentUser.Status {
 		fmt.Println("ERROR: No hay sesión activa.")
+		*buffer_string += "ERROR: No hay sesión activa.\n"
 		return
 	}
 
 	driveLetter := string(id[0])
-	filePath := "./test/" + strings.ToUpper(driveLetter) + ".bin"
+	filePath := "./fs/test/" + strings.ToUpper(driveLetter) + ".bin"
 	file, err := utils.OpenFile(filePath)
 	if err != nil {
 		fmt.Println("ERROR: No se pudo abrir el archivo binario.")
+		*buffer_string += "ERROR: No se pudo abrir el archivo binario.\n"
 		return
 	}
 	defer file.Close()
@@ -755,18 +802,21 @@ func GenerarReporteBlock(pathSalida string, id string) {
 	var mbr structs.MRB
 	if err := utils.ReadObject(file, &mbr, 0); err != nil {
 		fmt.Println("ERROR: No se pudo leer el MBR.")
+		*buffer_string += "ERROR: No se pudo leer el MBR.\n"
 		return
 	}
 
 	index := int(id[1] - '1')
 	if index < 0 || index > 3 {
 		fmt.Println("ERROR: Índice fuera de rango.")
+		*buffer_string += "ERROR: Índice fuera de rango.\n"
 		return
 	}
 
 	var sb structs.Superblock
 	if err := utils.ReadObject(file, &sb, int64(mbr.Partitions[index].Start)); err != nil {
 		fmt.Println("ERROR: No se pudo leer el Superbloque.")
+		*buffer_string += "ERROR: No se pudo leer el Superbloque.\n"
 		return
 	}
 
@@ -814,25 +864,29 @@ func GenerarReporteBlock(pathSalida string, id string) {
 
 	if err := os.WriteFile("block.dot", []byte(dot.String()), 0644); err != nil {
 		fmt.Println("ERROR: No se pudo guardar el archivo .dot.")
+		*buffer_string += "ERROR: No se pudo guardar el archivo .dot.\n"
 		return
 	}
 
 	cmd := exec.Command("dot", "-Tjpg", "block.dot", "-o", pathSalida)
 	if err := cmd.Run(); err != nil {
 		fmt.Println("ERROR ejecutando Graphviz:", err)
+		*buffer_string += "ERROR ejecutando Graphviz: " + err.Error() + "\n"
 		return
 	}
 
+	*buffer_string += "Reporte Block generado exitosamente: " + pathSalida + "\n"
 	fmt.Println("Reporte Block generado exitosamente:", pathSalida)
 }
 
-func GenerarReporteSB(path string, id string) {
+func GenerarReporteSB(path string, id string, buffer_string *string) {
 	driveLetter := string(id[0])
-	filepath := "./test/" + strings.ToUpper(driveLetter) + ".bin"
+	filepath := "./fs/test/" + strings.ToUpper(driveLetter) + ".bin"
 
 	file, err := utils.OpenFile(filepath)
 	if err != nil {
 		fmt.Println("Error al abrir disco:", err)
+		fmt.Println("ERROR: No se pudo abrir el disco.")
 		return
 	}
 	defer file.Close()
@@ -840,12 +894,14 @@ func GenerarReporteSB(path string, id string) {
 	var mbr structs.MRB
 	if err := utils.ReadObject(file, &mbr, 0); err != nil {
 		fmt.Println("Error al leer MBR:", err)
+		*buffer_string += "Error al leer MBR: " + err.Error() + "\n"
 		return
 	}
 
 	index := int(id[1] - '1')
 	if index < 0 || index >= 4 {
 		fmt.Println("Índice de partición inválido.")
+		*buffer_string += "Índice de partición inválido.\n"
 		return
 	}
 
@@ -853,6 +909,7 @@ func GenerarReporteSB(path string, id string) {
 	var sb structs.Superblock
 	if err := utils.ReadObject(file, &sb, int64(start)); err != nil {
 		fmt.Println("Error al leer Superbloque:", err)
+		*buffer_string += "Error al leer Superbloque: " + err.Error() + "\n"
 		return
 	}
 
@@ -888,31 +945,40 @@ func GenerarReporteSB(path string, id string) {
 	dotPath := "sb.dot"
 	if err := os.WriteFile(dotPath, []byte(dot.String()), 0644); err != nil {
 		fmt.Println("Error al escribir archivo DOT:", err)
+		*buffer_string += "Error al escribir archivo DOT: " + err.Error() + "\n"
 		return
 	}
 
 	cmd := exec.Command("dot", "-Tpng", dotPath, "-o", path)
 	if err := cmd.Run(); err != nil {
 		fmt.Println("Error ejecutando Graphviz:", err)
+		*buffer_string += "Error ejecutando Graphviz: " + err.Error() + "\n"
 		return
 	}
 
+	*buffer_string += "Reporte SB generado exitosamente: " + path + "\n"
 	fmt.Println("Reporte SB generado exitosamente:", path)
 }
 
-func GenerarReporteFile(id string, path string, ruta string) {
+func GenerarReporteFile(id string, path string, ruta string, buffer_string *string) {
 	fmt.Println("======Start REP FILE======")
 	fmt.Println("ID:", id)
 	fmt.Println("Path:", path)
 	fmt.Println("Ruta:", ruta)
 
+	*buffer_string += "======Start REP FILE======\n"
+	*buffer_string += "ID: " + id + "\n"
+	*buffer_string += "Path: " + path + "\n"
+	*buffer_string += "Ruta: " + ruta + "\n"
+
 	driveLetter := string(id[0])
-	binPath := "./test/" + strings.ToUpper(driveLetter) + ".bin"
+	binPath := "./fs/test/" + strings.ToUpper(driveLetter) + ".bin"
 
 	// Abrir archivo binario
 	file, err := utils.OpenFile(binPath)
 	if err != nil {
 		fmt.Println("Error al abrir disco:", err)
+		*buffer_string += "Error al abrir disco: " + err.Error() + "\n"
 		return
 	}
 	defer file.Close()
@@ -921,18 +987,21 @@ func GenerarReporteFile(id string, path string, ruta string) {
 	var mbr structs.MRB
 	if err := utils.ReadObject(file, &mbr, 0); err != nil {
 		fmt.Println("Error leyendo el MBR:", err)
+		*buffer_string += "Error leyendo el MBR: " + err.Error() + "\n"
 		return
 	}
 
 	index := int(id[1] - '1')
 	if index < 0 || index > 3 {
 		fmt.Println("ERROR: Índice de partición inválido.")
+		*buffer_string += "ERROR: Índice de partición inválido.\n"
 		return
 	}
 
 	part := mbr.Partitions[index]
 	if part.Size == 0 {
 		fmt.Println("ERROR: La partición no existe.")
+		*buffer_string += "ERROR: La partición no existe.\n"
 		return
 	}
 
@@ -940,6 +1009,7 @@ func GenerarReporteFile(id string, path string, ruta string) {
 	var sb structs.Superblock
 	if err := utils.ReadObject(file, &sb, int64(part.Start)); err != nil {
 		fmt.Println("Error leyendo el superbloque:", err)
+		*buffer_string += "Error leyendo el superbloque: " + err.Error() + "\n"
 		return
 	}
 
@@ -947,6 +1017,7 @@ func GenerarReporteFile(id string, path string, ruta string) {
 	inodeIndex := utils_inodes.InitSearch(ruta, file, sb)
 	if inodeIndex == -1 {
 		fmt.Println("ERROR: No se encontró el archivo:", ruta)
+		*buffer_string += "ERROR: No se encontró el archivo: " + ruta + "\n"
 		return
 	}
 
@@ -954,6 +1025,7 @@ func GenerarReporteFile(id string, path string, ruta string) {
 	var inode structs.Inode
 	if err := utils.ReadObject(file, &inode, inodeOffset); err != nil {
 		fmt.Println("Error leyendo el inodo:", err)
+		*buffer_string += "Error leyendo el inodo: " + err.Error() + "\n"
 		return
 	}
 
@@ -961,26 +1033,31 @@ func GenerarReporteFile(id string, path string, ruta string) {
 	contenido := utils_inodes.GetInodeFileData(inode, file, sb)
 	if contenido == "" {
 		fmt.Println("Advertencia: archivo vacío o error de lectura.")
+		*buffer_string += "Advertencia: archivo vacío o error de lectura.\n"
 	}
 	fmt.Println("Contenido del archivo:", contenido)
 	// Guardar el contenido en un archivo de salida
 	if err := os.WriteFile(path, []byte(contenido), 0644); err != nil {
 		fmt.Println("Error escribiendo el archivo de salida:", err)
+		*buffer_string += "Error escribiendo el archivo de salida: " + err.Error() + "\n"
 		return
 	}
 
+	*buffer_string += "Reporte FILE generado correctamente en: " + path + "\n"
 	fmt.Println("Reporte FILE generado correctamente en:", path)
 }
 
-func GenerarReporteLS(id string, path string, ruta string) {
+func GenerarReporteLS(id string, path string, ruta string, buffer_string *string) {
 	fmt.Println("======Start REP LS======")
+	*buffer_string += "======Start REP LS======\n"
 
 	driveLetter := string(id[0])
-	binPath := "./test/" + strings.ToUpper(driveLetter) + ".bin"
+	binPath := "./fs/test/" + strings.ToUpper(driveLetter) + ".bin"
 
 	file, err := utils.OpenFile(binPath)
 	if err != nil {
 		fmt.Println("Error al abrir disco:", err)
+		*buffer_string += "Error al abrir disco: " + err.Error() + "\n"
 		return
 	}
 	defer file.Close()
@@ -988,30 +1065,35 @@ func GenerarReporteLS(id string, path string, ruta string) {
 	var mbr structs.MRB
 	if err := utils.ReadObject(file, &mbr, 0); err != nil {
 		fmt.Println("Error leyendo MBR:", err)
+		*buffer_string += "Error leyendo MBR: " + err.Error() + "\n"
 		return
 	}
 
 	index := int(id[1] - '1')
 	if index < 0 || index > 3 {
 		fmt.Println("ERROR: Índice de partición inválido.")
+		*buffer_string += "ERROR: Índice de partición inválido.\n"
 		return
 	}
 
 	part := mbr.Partitions[index]
 	if part.Size == 0 {
 		fmt.Println("ERROR: La partición no existe.")
+		*buffer_string += "ERROR: La partición no existe.\n"
 		return
 	}
 
 	var sb structs.Superblock
 	if err := utils.ReadObject(file, &sb, int64(part.Start)); err != nil {
 		fmt.Println("Error leyendo superbloque:", err)
+		*buffer_string += "Error leyendo superbloque: " + err.Error() + "\n"
 		return
 	}
 
 	inodeIndex := utils_inodes.InitSearch(ruta, file, sb)
 	if inodeIndex == -1 {
 		fmt.Println("ERROR: No se encontró la ruta:", ruta)
+		*buffer_string += "ERROR: No se encontró la ruta: " + ruta + "\n"
 		return
 	}
 
@@ -1019,6 +1101,7 @@ func GenerarReporteLS(id string, path string, ruta string) {
 	var inode structs.Inode
 	if err := utils.ReadObject(file, &inode, inodeOffset); err != nil {
 		fmt.Println("Error leyendo inodo:", err)
+		*buffer_string += "Error leyendo inodo: " + err.Error() + "\n"
 		return
 	}
 
@@ -1072,8 +1155,10 @@ func GenerarReporteLS(id string, path string, ruta string) {
 	// Guardar en archivo de texto
 	if err := os.WriteFile(path, []byte(builder.String()), 0644); err != nil {
 		fmt.Println("Error escribiendo el archivo de salida:", err)
+		*buffer_string += "Error escribiendo el archivo de salida: " + err.Error() + "\n"
 		return
 	}
 
-	fmt.Println("✅ Reporte LS generado como archivo de texto en:", path)
+	*buffer_string += "Reporte LS generado como archivo de texto en: " + path + "\n"
+	fmt.Println("Reporte LS generado como archivo de texto en:", path)
 }

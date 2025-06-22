@@ -10,7 +10,7 @@ mkdisk -size=12
 
 # ERROR NO EXISTE EL DISCO
 fdisk -type=P -driveletter=Z -size=500 -unit=K -name=error1
-pause
+#pause
 
 fdisk -type=P -driveletter=A -size=500 -unit=K -name=particion1
 fdisk -type=P -driveletter=A -size=700 -unit=K -name=particion2
@@ -36,7 +36,7 @@ mount -name=particion1 -driveletter=C
 # ERROR NO EXISTE EL ID
 unmount -id=E160
 unmount -id=F260
-pause 
+#pause 
 
 # =====COLOCAR LOS DÍGITOS DEL CARNET=====
 unmount -id=A210
@@ -46,11 +46,11 @@ unmount -id=A310
 mkfs -type=full -id=A110 -fs=3fs
 mkfs -type=full -id=B110 -fs=2fs
 mkfs -type=full -id=C110 -fs=3fs
-pause
+#pause
 
 # ERROR NO EXISTE EL USUARIO
 login -user=user -pass=123 -id=A110
-pause 
+#pause 
 
 login -user=root -pass=123 -id=A110
 
@@ -74,23 +74,23 @@ mkusr -user=user2 -pass=123 -grp=grupo1
 
 # ERROR USUARIO REPETIDO
 mkusr -user=user1 -pass=123 -grp=grupo3
-pause
+#pause
 
 # ERROR GRUPO ELIMINADO
 mkusr -user=user3 -pass=123 -grp=grupo8
-pause
+#pause
 
 rmusr -user=user2
 
 # ERROR USUARIO ELIMINADO
 rmusr -user=user2
-pause
+#pause
 
 logout
 
 #ERROR NO HAY SESION INICIADA
 logout 
-pause 
+#pause 
 
 
 
@@ -100,27 +100,27 @@ mkfile -size=15 -path=/home/user/docs/a.txt -r
 
 # ERROR DIRECTORIO NO CREADO
 mkfile -path="/home/mis documentos/archivo 1.txt"
-pause
+#pause
 
 cat -file1=/home/user/docs/a.txt
 
 # ERROR NO EXISTE EL ARCHIVO
 cat -file1=/home/user/docs/b.txt
-pause
+#pause
 
 mkdir -r -path=/home/user/docs/tareas
 mkdir -r -path=/home/user/docs/proyectos
 
 # ERROR NO EXISTE LA CARPETA ARCHVIOS
 mkdir -r -path=/home/user/archivos/proyecto1
-pause
+#pause
 
 find -path=/ -name=*
 find -path=/home/user/docs -name=*
 
 # ERROR NO EXISTE EL ARCHIVO
 find -path=/home/user/docs -name=b.txt
-pause
+#pause
 
 logout
 

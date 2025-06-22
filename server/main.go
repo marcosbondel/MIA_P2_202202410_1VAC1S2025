@@ -28,7 +28,9 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if user.Login(req.User, req.Pass, req.Id) {
+	var buffer_string string = ""
+
+	if user.Login(req.User, req.Pass, req.Id, &buffer_string) {
 		// Código 200 OK
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(models.LoginResponse{
@@ -48,7 +50,9 @@ func login(w http.ResponseWriter, r *http.Request) {
 func logout(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	if !user.Logout() {
+	var buffer_string string = ""
+
+	if !user.Logout(&buffer_string) {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(models.LoginResponse{
 			Status:  "fail",
@@ -81,6 +85,7 @@ func doExecute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("Command String:", req.CommandString)
 	response_string := analyzer.AnalyzeHTTPInput(req.CommandString)
 
 	// json.NewEncoder(w).Encode("Command executed successfully.")

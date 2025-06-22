@@ -85,33 +85,33 @@ func AnalyzeCommnad(command string, params string, buffer_response *string) {
 	case "mount":
 		fn_mount(params, buffer_response)
 	case "unmount":
-		fn_unmount(params)
+		fn_unmount(params, buffer_response)
 	case "mkfs":
-		fn_mkfs(params)
+		fn_mkfs(params, buffer_response)
 	case "login":
-		fn_login(params)
+		fn_login(params, buffer_response)
 	case "logout":
-		fn_logout()
+		fn_logout(buffer_response)
 	case "mkgrp":
-		fn_mkgrp(params)
+		fn_mkgrp(params, buffer_response)
 	case "rmgrp":
-		fn_rmgrp(params)
+		fn_rmgrp(params, buffer_response)
 	case "mkusr":
-		fn_mkusr(params)
+		fn_mkusr(params, buffer_response)
 	case "rmusr":
-		fn_rmusr(params)
+		fn_rmusr(params, buffer_response)
 	case "mkfile":
-		fn_mkfile(params)
+		fn_mkfile(params, buffer_response)
 	case "mkdir":
-		fn_mkdir(params)
+		fn_mkdir(params, buffer_response)
 	case "find":
-		fn_find(params)
+		fn_find(params, buffer_response)
 	case "cat":
-		fn_cat(params)
+		fn_cat(params, buffer_response)
 	case "pause":
 		file_manager.Pause()
 	case "rep":
-		fn_rep(params)
+		fn_rep(params, buffer_response)
 	case "execute":
 		fn_execute(params, buffer_response)
 	case "exit":
@@ -135,7 +135,7 @@ func fn_mount(params string, buffer_response *string) {
 	disk_management.Mount(*name, *path, buffer_response)
 }
 
-func fn_unmount(params string) {
+func fn_unmount(params string, buffer_response *string) {
 	// Define flags
 	fs := flag.NewFlagSet("unmount", flag.ExitOnError)
 	id_partition := fs.String("id", "", "Id of the partition")
@@ -155,11 +155,12 @@ func fn_unmount(params string) {
 			fs.Set(flagName, flagValue)
 		default:
 			fmt.Println("Error: Flag not found")
+			*buffer_response += fmt.Sprintf("Error: Flag not found: %s\n", flagName)
 		}
 	}
 
 	// Call the function
-	disk_management.Unmount(*id_partition)
+	disk_management.Unmount(*id_partition, buffer_response)
 }
 
 func fn_fdisk(params string, buffer_response *string) {
@@ -268,7 +269,7 @@ func fn_rmdisk(params string, buffer_response *string) {
 	disk_management.Rmdisk(*driveLetter, buffer_response)
 }
 
-func fn_mkfs(input string) {
+func fn_mkfs(input string, buffer_response *string) {
 	// Define flags
 	fs := flag.NewFlagSet("mkfs", flag.ExitOnError)
 	id := fs.String("id", "", "Id")
@@ -293,15 +294,16 @@ func fn_mkfs(input string) {
 			fs.Set(flagName, flagValue)
 		default:
 			fmt.Println("Error: Flag not found")
+			*buffer_response += "Error: Flag not found: " + flagName + "\n"
 		}
 	}
 
 	// Call the function
-	file_system.Mkfs(*id, *type_, *fs_)
+	file_system.Mkfs(*id, *type_, *fs_, buffer_response)
 
 }
 
-func fn_login(input string) {
+func fn_login(input string, buffer_string *string) {
 	// Define flags
 	fs := flag.NewFlagSet("login", flag.ExitOnError)
 	user_ := fs.String("user", "", "User")
@@ -326,19 +328,20 @@ func fn_login(input string) {
 			fs.Set(flagName, flagValue)
 		default:
 			fmt.Println("Error: Flag not found")
+			*buffer_string += fmt.Sprintf("Error: Flag not found: %s\n", flagName)
 		}
 	}
 
 	// Call the function
-	user.Login(*user_, *pass, *id)
+	user.Login(*user_, *pass, *id, buffer_string)
 
 }
 
-func fn_logout() {
-	user.Logout()
+func fn_logout(buffer_string *string) {
+	user.Logout(buffer_string)
 }
 
-func fn_mkusr(input string) {
+func fn_mkusr(input string, buffer_string *string) {
 	// Define flags
 	fs := flag.NewFlagSet("login", flag.ExitOnError)
 	user := fs.String("user", "", "Usuario")
@@ -363,15 +366,16 @@ func fn_mkusr(input string) {
 			fs.Set(flagName, flagValue)
 		default:
 			fmt.Println("Error: Flag not found")
+			*buffer_string += fmt.Sprintf("Error: Flag not found: %s\n", flagName)
 		}
 	}
 
 	// Call the function
-	file_manager.Mkusr(*user, *pass, *grp)
+	file_manager.Mkusr(*user, *pass, *grp, buffer_string)
 
 }
 
-func fn_mkgrp(input string) {
+func fn_mkgrp(input string, buffer_string *string) {
 	// Define flags
 	fs := flag.NewFlagSet("mkgrp", flag.ExitOnError)
 	grp := fs.String("name", "", "Group name")
@@ -391,14 +395,15 @@ func fn_mkgrp(input string) {
 			fs.Set(flagName, flagValue)
 		default:
 			fmt.Println("Error: Flag not found")
+			*buffer_string += fmt.Sprintf("Error: Flag not found: %s\n", flagName)
 		}
 	}
 
 	// Call the function
-	file_manager.Mkgrp(*grp)
+	file_manager.Mkgrp(*grp, buffer_string)
 }
 
-func fn_rep(params string) {
+func fn_rep(params string, buffer_string *string) {
 	flagSet := flag.NewFlagSet("rep", flag.ContinueOnError)
 	name := flagSet.String("name", "", "Nombre del reporte")
 	path := flagSet.String("path", "", "Ruta de salida del reporte")
@@ -408,15 +413,17 @@ func fn_rep(params string) {
 	args := strings.Fields(params)
 	if err := flagSet.Parse(args); err != nil {
 		fmt.Println("Error:", err)
+		*buffer_string += "Error: " + err.Error() + "\n"
 		return
 	}
 
 	if *name == "" || *path == "" || *id == "" {
 		fmt.Println("ERROR: Faltan parámetros en rep.")
+		*buffer_string += "ERROR: Faltan parámetros en rep.\n"
 		return
 	}
 
-	reports_generator.GenerarReporte(*name, *path, *id, *ruta)
+	reports_generator.GenerarReporte(*name, *path, *id, *ruta, buffer_string)
 }
 
 func fn_execute(params string, buffer_string *string) {
@@ -459,7 +466,7 @@ func fn_execute(params string, buffer_string *string) {
 	fmt.Println("===End===")
 }
 
-func fn_rmgrp(input string) {
+func fn_rmgrp(input string, buffer_string *string) {
 	// Define flags
 	fs := flag.NewFlagSet("rmgrp", flag.ExitOnError)
 	grp := fs.String("name", "", "Group	name")
@@ -479,14 +486,15 @@ func fn_rmgrp(input string) {
 			fs.Set(flagName, flagValue)
 		default:
 			fmt.Println("Error: Flag not found")
+			*buffer_string += fmt.Sprintf("Error: Flag not found: %s\n", flagName)
 		}
 	}
 
 	// Call the function
-	file_manager.Rmgrp(*grp)
+	file_manager.Rmgrp(*grp, buffer_string)
 }
 
-func fn_rmusr(input string) {
+func fn_rmusr(input string, buffer_string *string) {
 	// Define flags
 	fs := flag.NewFlagSet("rmusr", flag.ExitOnError)
 	user_ := fs.String("user", "", "User")
@@ -506,15 +514,16 @@ func fn_rmusr(input string) {
 			fs.Set(flagName, flagValue)
 		default:
 			fmt.Println("Error: Flag not found")
+			*buffer_string += fmt.Sprintf("Error: Flag not found: %s\n", flagName)
 		}
 	}
 
 	// Call the function
-	file_manager.Rmusr(*user_)
+	file_manager.Rmusr(*user_, buffer_string)
 
 }
 
-func fn_mkfile(input string) {
+func fn_mkfile(input string, buffer_string *string) {
 	// Inicializa los flags con valores por defecto
 	fs := flag.NewFlagSet("mkfile", flag.ExitOnError)
 	path := fs.String("path", "", "Path of the file")
@@ -543,15 +552,16 @@ func fn_mkfile(input string) {
 			fs.Set(flagName, flagValue)
 		// No hagas nada con -r aquí, ya lo evaluaste antes
 		default:
-			fmt.Printf("⚠️  Warning: Flag -%s no reconocido\n", flagName)
+			fmt.Printf("Warning: Flag -%s no reconocido\n", flagName)
+			*buffer_string += fmt.Sprintf("Warning: Flag -%s no reconocido\n", flagName)
 		}
 	}
 
 	// Llama a la función
-	file_manager.Mkfile(*path, *size, *r, *cont)
+	file_manager.Mkfile(*path, *size, *r, *cont, buffer_string)
 }
 
-func fn_cat(input string) {
+func fn_cat(input string, buffer_string *string) {
 	// Define flags
 	fs := flag.NewFlagSet("cat", flag.ExitOnError)
 	path := fs.String("file1", "", "file1 of the file")
@@ -571,14 +581,15 @@ func fn_cat(input string) {
 			fs.Set(flagName, flagValue)
 		default:
 			fmt.Println("Error: Flag not found")
+			*buffer_string += fmt.Sprintf("Error: Flag not found: %s\n", flagName)
 		}
 	}
 
 	// Call the function
-	file_manager.Cat(*path)
+	file_manager.Cat(*path, buffer_string)
 }
 
-func fn_mkdir(input string) {
+func fn_mkdir(input string, buffer_string *string) {
 	// Define flags
 	fs := flag.NewFlagSet("mkdir", flag.ExitOnError)
 	path := fs.String("path", "", "Path of the directory")
@@ -599,14 +610,15 @@ func fn_mkdir(input string) {
 			fs.Set(flagName, flagValue)
 		default:
 			fmt.Println("Error: Flag not found")
+			*buffer_string += fmt.Sprintf("Error: Flag not found: %s\n", flagName)
 		}
 	}
 
 	// Call the function
-	file_manager.Mkdir(*path, *r)
+	file_manager.Mkdir(*path, *r, buffer_string)
 }
 
-func fn_find(input string) {
+func fn_find(input string, buffer_string *string) {
 	// Define flags
 	fs := flag.NewFlagSet("find", flag.ExitOnError)
 	path := fs.String("path", "", "Path of the file")
@@ -627,9 +639,10 @@ func fn_find(input string) {
 			fs.Set(flagName, flagValue)
 		default:
 			fmt.Println("Error: Flag not found")
+			*buffer_string += fmt.Sprintf("Error: Flag not found: %s\n", flagName)
 		}
 	}
 	// Call the function
-	file_manager.Find(*path, *name)
+	file_manager.Find(*path, *name, buffer_string)
 
 }
