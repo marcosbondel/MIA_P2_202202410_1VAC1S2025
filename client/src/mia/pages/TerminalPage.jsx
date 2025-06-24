@@ -63,7 +63,7 @@ export const TerminalPage = () => {
     }, [lines]);
 
     return (
-        <MIALayout>
+        // <MIALayout>
             <Container >
                 <Toolbar />
                 <Toolbar />
@@ -102,6 +102,6 @@ export const TerminalPage = () => {
                     <div ref={terminalEndRef} />
                 </Box>
             </Container>
-        </MIALayout>
+        // </MIALayout>
     );
 }

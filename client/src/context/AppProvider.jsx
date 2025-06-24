@@ -10,7 +10,7 @@ const init = () => {
         error: "",
         result: {},
         showError: false,
-        disks: JSON.parse(localStorage.getItem('disks')) || []
+        disks: []
     }
 }
 
@@ -46,15 +46,13 @@ export const AppProvider = ({ children }) => {
         if(!response.ok) {
             const error = await response.json();
             console.error("Failed to fetch disks:", error);
-            return [];
+            return
         }
 
         const disks = await response.json();
         console.log("Disks fetched successfully:", disks);
-        localStorage.setItem('disks', JSON.stringify(disks));
 
-        dispatch({ type: 'disks[set]', payload: { disks } });
-        return disks;
+        dispatch({ type: 'disks[set]', payload: disks });
     }
 
     const logout = async() => {
@@ -79,8 +77,6 @@ export const AppProvider = ({ children }) => {
     }
 
     useEffect(() => {
-
-        if (Object.keys(state.disks).length !== 0) return
 
         getDisks()
 

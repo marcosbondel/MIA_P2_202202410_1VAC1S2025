@@ -1,38 +1,31 @@
-import React from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { LoginPage } from '../auth/pages'
 import { MIAPage, TerminalPage } from '../mia/pages'
 import { PublicRoute } from './PublicRoute'
 import { PrivateRoute } from './PrivateRoute'
+import { MIALayout } from '../mia/layout/MIALayout'
 
 export const AppRouter = () => {
     return (
         <Routes>
-            {/* Public Route */}
             <Route path="/login" element={
                 <PublicRoute>
                     <LoginPage />
                 </PublicRoute>
             } />
 
-            {/* Private Routes */}
             <Route path="/mia" element={
                 <PrivateRoute>
-                    <MIAPage />
+                    <MIALayout />
                 </PrivateRoute>
-            } />
+            }>
+                <Route path="" element={<MIAPage />} />
+                <Route path="terminal" element={<TerminalPage />} />
+                <Route path="*" element={<Navigate to='/mia' />} />
+            </Route>
 
-            <Route path="/mia/terminal" element={
-                <PrivateRoute>
-                    <TerminalPage />
-                </PrivateRoute>
-            } />
-            
-            <Route path="/*" element={
-                <PrivateRoute>
-                    <MIAPage/>
-                </PrivateRoute>
-            }/>
+            <Route path="/*" element={<Navigate to='/mia' />}/>
+
         </Routes>
     )
 }

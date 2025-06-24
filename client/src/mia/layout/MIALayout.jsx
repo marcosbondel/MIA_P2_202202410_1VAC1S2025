@@ -1,5 +1,6 @@
 import { Box, Toolbar, Typography } from "@mui/material";
 import { NavBar } from "../components/NavBar";
+import { Outlet } from "react-router-dom";
 
 const drawerWidth = 240
 
@@ -8,13 +9,9 @@ export const MIALayout = ({children}) => {
         <Box
             sx={{ display: 'flex' }}
         >
-            {/* <Sidebar /> */}
-            {/* <Sidebar drawerWidth={drawerWidth}/> */}
             <NavBar drawerWidth={drawerWidth} />
-            {/* <NavBar drawerWidth={drawerWidth}/> */}
-            {/* <NavBar /> */}
             
-            {children}
+            <Outlet/>
         </Box>
     )
 }

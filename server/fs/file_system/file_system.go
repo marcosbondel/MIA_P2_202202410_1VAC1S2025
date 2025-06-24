@@ -3,8 +3,10 @@ package file_system
 import (
 	"MIA_P2_202202410_1VAC1S2025/fs/structs"
 	"MIA_P2_202202410_1VAC1S2025/fs/utils"
+	"MIA_P2_202202410_1VAC1S2025/models"
 	"encoding/binary"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -256,4 +258,53 @@ func create_ext3(n int32, partition structs.Partition, sb structs.Superblock, da
 	utils.WriteObject(file, fileBlock1, int64(sb.S_block_start+int32(binary.Size(fileBlock1))))
 
 	fmt.Println("======End CREATE EXT3======")
+}
+
+// ListDisks escanea la carpeta ./test y retorna una lista de discos disponibles
+func ListDisks() ([]string, error) {
+	files, err := ioutil.ReadDir("./fs/test")
+	if err != nil {
+		return nil, err
+	}
+
+	var disks []string
+	for _, file := range files {
+		if !file.IsDir() && strings.HasSuffix(file.Name(), ".bin") {
+			disks = append(disks, strings.TrimSuffix(file.Name(), ".bin"))
+		}
+	}
+	return disks, nil
+}
+
+func GetDiskPartitions(driveLetter string) ([]models.PartitionInfo, error) {
+	path := "./test/" + strings.ToUpper(driveLetter) + ".bin"
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("no se pudo abrir el archivo del disco: %v", err)
+	}
+	defer file.Close()
+
+	var mbr structs.MRB
+	if err := utils.ReadObject(file, &mbr, 0); err != nil {
+		return nil, fmt.Errorf("no se pudo leer el MBR: %v", err)
+	}
+
+	var partitions []models.PartitionInfo
+	for _, part := range mbr.Partitions {
+		if part.Size == 0 {
+			continue
+		}
+
+		p := models.PartitionInfo{
+			Status: strings.Trim(string(part.Status[:]), "\x00"),
+			Type:   strings.Trim(string(part.Type[:]), "\x00"),
+			Fit:    strings.Trim(string(part.Fit[:]), "\x00"),
+			Start:  part.Start,
+			Size:   part.Size,
+			Name:   strings.Trim(string(part.Name[:]), "\x00"),
+		}
+		partitions = append(partitions, p)
+	}
+
+	return partitions, nil
 }

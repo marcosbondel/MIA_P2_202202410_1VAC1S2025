@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"MIA_P2_202202410_1VAC1S2025/fs/analyzer"
+	"MIA_P2_202202410_1VAC1S2025/fs/file_system"
 	"MIA_P2_202202410_1VAC1S2025/fs/user"
 	"MIA_P2_202202410_1VAC1S2025/models"
 
@@ -93,14 +94,33 @@ func doExecute(w http.ResponseWriter, r *http.Request) {
 }
 
 func getDisks(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Fetching disks...")
 	w.Header().Set("Content-Type", "application/json")
 
-	// Aquí podrías implementar la lógica para obtener los discos
-	// Por ahora, simplemente devolvemos un mensaje de ejemplo
-	disks := []string{"A", "B", "C"}
+	disks, err := file_system.ListDisks()
+	if err != nil {
+		http.Error(w, `{"error":"No se pudieron listar los discos"}`, http.StatusInternalServerError)
+		return
+	}
 
-	json.NewEncoder(w).Encode(disks)
+	response := models.DiskResponse{Disks: disks}
+	json.NewEncoder(w).Encode(response)
+}
+
+// main.go o handlers/partitions.go
+func getDiskPartitions(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Obtener letra del disco desde query param: /api/disks/A/partitions
+	vars := mux.Vars(r)
+	letter := vars["letter"]
+
+	partitions, err := file_system.GetDiskPartitions(letter)
+	if err != nil {
+		http.Error(w, fmt.Sprintf(`{"error":"%s"}`, err.Error()), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(partitions)
 }
 
 func main() {
@@ -112,8 +132,8 @@ func main() {
 	r.HandleFunc("/api/disks", getDisks).Methods("GET")
 	r.HandleFunc("/api/auth/login", login).Methods("POST")
 	r.HandleFunc("/api/auth/logout", logout).Methods("POST")
-
 	r.HandleFunc("/api/run_command", doExecute).Methods("POST")
+	r.HandleFunc("/api/disks/{letter}/partitions", getDiskPartitions).Methods("GET")
 
 	// CORS setup
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
