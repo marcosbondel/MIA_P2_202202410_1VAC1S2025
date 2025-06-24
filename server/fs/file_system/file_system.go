@@ -3,10 +3,13 @@ package file_system
 import (
 	"MIA_P2_202202410_1VAC1S2025/fs/structs"
 	"MIA_P2_202202410_1VAC1S2025/fs/utils"
+	"MIA_P2_202202410_1VAC1S2025/fs/utils_inodes"
 	"MIA_P2_202202410_1VAC1S2025/models"
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"strings"
 )
@@ -277,7 +280,7 @@ func ListDisks() ([]string, error) {
 }
 
 func GetDiskPartitions(driveLetter string) ([]models.PartitionInfo, error) {
-	path := "./test/" + strings.ToUpper(driveLetter) + ".bin"
+	path := "./fs/test/" + strings.ToUpper(driveLetter) + ".bin"
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("no se pudo abrir el archivo del disco: %v", err)
@@ -295,16 +298,145 @@ func GetDiskPartitions(driveLetter string) ([]models.PartitionInfo, error) {
 			continue
 		}
 
-		p := models.PartitionInfo{
-			Status: strings.Trim(string(part.Status[:]), "\x00"),
-			Type:   strings.Trim(string(part.Type[:]), "\x00"),
-			Fit:    strings.Trim(string(part.Fit[:]), "\x00"),
-			Start:  part.Start,
-			Size:   part.Size,
-			Name:   strings.Trim(string(part.Name[:]), "\x00"),
+		partType := strings.ToLower(strings.Trim(string(part.Type[:]), "\x00"))
+		if partType == "e" {
+			// Leer particiones lógicas desde EBRs
+			next := part.Start
+			for {
+				var ebr structs.EBR
+				if err := utils.ReadObject(file, &ebr, int64(next)); err != nil {
+					break
+				}
+
+				if ebr.PartSize > 0 {
+					p := models.PartitionInfo{
+						Status: fmt.Sprintf("%d", ebr.PartStatus),
+						Type:   "L",
+						Fit:    strings.Trim(string(ebr.PartFit[:]), "\x00"),
+						Start:  ebr.PartStart,
+						Size:   ebr.PartSize,
+						Name:   strings.Trim(string(ebr.PartName[:]), "\x00"),
+					}
+					partitions = append(partitions, p)
+				}
+
+				if ebr.PartNext <= 0 || ebr.PartNext == next {
+					break
+				}
+				next = ebr.PartNext
+			}
+		} else {
+			p := models.PartitionInfo{
+				Status: strings.Trim(string(part.Status[:]), "\x00"),
+				Type:   strings.ToUpper(strings.Trim(string(part.Type[:]), "\x00")),
+				Fit:    strings.Trim(string(part.Fit[:]), "\x00"),
+				Start:  part.Start,
+				Size:   part.Size,
+				Name:   strings.Trim(string(part.Name[:]), "\x00"),
+			}
+			partitions = append(partitions, p)
 		}
-		partitions = append(partitions, p)
 	}
 
+	fmt.Println("Particiones encontradas:", len(partitions))
+	fmt.Println("Particiones:", partitions)
+
 	return partitions, nil
+}
+
+func GetFileSystem(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	path := r.URL.Query().Get("path")
+	if path == "" {
+		http.Error(w, "path is required", http.StatusBadRequest)
+		return
+	}
+
+	// Obtener ID de sesión activa (simulado por ahora como A110)
+	id := "A110"
+	driveLetter := string(id[0])
+	binPath := "./fs/test/" + strings.ToUpper(driveLetter) + ".bin"
+
+	file, err := os.Open(binPath)
+	if err != nil {
+		http.Error(w, "Error abriendo disco", http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	var mbr structs.MRB
+	if err := utils.ReadObject(file, &mbr, 0); err != nil {
+		http.Error(w, "Error leyendo MBR", http.StatusInternalServerError)
+		return
+	}
+
+	index := int(id[1] - '1')
+	part := mbr.Partitions[index]
+
+	var sb structs.Superblock
+	if err := utils.ReadObject(file, &sb, int64(part.Start)); err != nil {
+		http.Error(w, "Error leyendo superbloque", http.StatusInternalServerError)
+		return
+	}
+
+	inodeIndex := utils_inodes.InitSearch(path, file, sb)
+	if inodeIndex == -1 {
+		http.Error(w, "Ruta no encontrada", http.StatusNotFound)
+		return
+	}
+
+	var inode structs.Inode
+	offset := int64(sb.S_inode_start) + int64(inodeIndex)*int64(binary.Size(inode))
+	if err := utils.ReadObject(file, &inode, offset); err != nil {
+		http.Error(w, "Error leyendo inodo", http.StatusInternalServerError)
+		return
+	}
+
+	if inode.I_type[0] == '0' { // Es carpeta
+		var children []map[string]string
+
+		for _, blockIndex := range inode.I_block {
+			if blockIndex == -1 {
+				continue
+			}
+			var folderBlock structs.Folderblock
+			blockOffset := int64(sb.S_block_start) + int64(blockIndex)*int64(binary.Size(folderBlock))
+			if err := utils.ReadObject(file, &folderBlock, blockOffset); err != nil {
+				continue
+			}
+			for _, entry := range folderBlock.B_content {
+				name := strings.Trim(string(entry.B_name[:]), "\x00")
+				if name == "" || name == "." || name == ".." {
+					continue
+				}
+				childOffset := int64(sb.S_inode_start) + int64(entry.B_inodo)*int64(binary.Size(inode))
+				var childInode structs.Inode
+				if err := utils.ReadObject(file, &childInode, childOffset); err != nil {
+					continue
+				}
+				entryType := "file"
+				if childInode.I_type[0] == '0' {
+					entryType = "directory"
+				}
+				children = append(children, map[string]string{
+					"name": name,
+					"type": entryType,
+				})
+			}
+		}
+
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"type":     "directory",
+			"path":     path,
+			"children": children,
+		})
+	} else { // Es archivo
+		content := utils_inodes.GetInodeFileData(inode, file, sb)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"type":    "file",
+			"path":    path,
+			"content": content,
+		})
+	}
 }

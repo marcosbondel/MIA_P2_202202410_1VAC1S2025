@@ -5,7 +5,7 @@ export const DiskCard = ({disk}) => {
     const navigate = useNavigate();
 
     const handleDiskClick = () => {
-        navigate(`/mia/disk/${disk}`);
+        navigate(`/mia/disks/${disk}`);
     }
 
     return (

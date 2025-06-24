@@ -19,6 +19,11 @@ export const appReducer = ( state, action) => {
                 ...state,
                 logged: action.payload.logged
             }
+        case 'partitions[set]':
+            return {
+                ...state,
+                partitions: action.payload.partitions
+            }
         default:
             break;
     }

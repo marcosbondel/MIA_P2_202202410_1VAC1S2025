@@ -10,7 +10,8 @@ const init = () => {
         error: "",
         result: {},
         showError: false,
-        disks: []
+        disks: [],
+        partitions: []
     }
 }
 
@@ -55,6 +56,20 @@ export const AppProvider = ({ children }) => {
         dispatch({ type: 'disks[set]', payload: disks });
     }
 
+    const getPartitions = async(disk) => {
+        const response = await fetch(`http://localhost:3000/api/disks/${disk}/partitions`);
+        if(!response.ok) {
+            const error = await response.json();
+            console.error("Failed to fetch partitions:", error);
+            dispatch({ type: 'error[set]', payload: { error: "Failed to fetch partitions" } });
+            return
+        }
+
+        const partitions = await response.json();
+
+        dispatch({ type: 'partitions[set]', payload: {partitions} });
+    }
+
     const logout = async() => {
         const response = await fetch('http://localhost:3000/api/auth/logout', {
             method: 'POST',
@@ -88,7 +103,8 @@ export const AppProvider = ({ children }) => {
             ...state,
             login,
             getDisks,
-            logout
+            logout,
+            getPartitions
         }}>
             {children}
             {/* { state.error.length != 0 && */}

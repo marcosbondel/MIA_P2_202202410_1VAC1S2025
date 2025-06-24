@@ -6,9 +6,9 @@ import MIAApp from './MIAApp.jsx'
 import { AppProvider } from './context/AppProvider.jsx'
 
 createRoot(document.getElementById('root')).render(
-    <StrictMode>
+    // <StrictMode>
         <BrowserRouter>
             <MIAApp />
         </BrowserRouter>
-    </StrictMode>
+    // </StrictMode>
 )

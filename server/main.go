@@ -134,6 +134,7 @@ func main() {
 	r.HandleFunc("/api/auth/logout", logout).Methods("POST")
 	r.HandleFunc("/api/run_command", doExecute).Methods("POST")
 	r.HandleFunc("/api/disks/{letter}/partitions", getDiskPartitions).Methods("GET")
+	r.HandleFunc("/api/fs", file_system.GetFileSystem).Methods("GET")
 
 	// CORS setup
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
