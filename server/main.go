@@ -11,6 +11,10 @@ import (
 	"MIA_P2_202202410_1VAC1S2025/fs/user"
 	"MIA_P2_202202410_1VAC1S2025/models"
 
+	"io"
+	"os"
+	"strings"
+
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
@@ -123,6 +127,49 @@ func getDiskPartitions(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(partitions)
 }
 
+func uploadSDAAFile(w http.ResponseWriter, r *http.Request) {
+	// Limita tamaño del archivo a 10MB
+	r.ParseMultipartForm(10 << 20)
+
+	// Recupera el archivo
+	file, handler, err := r.FormFile("file")
+	if err != nil {
+		http.Error(w, "Error leyendo el archivo", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	// Verifica extensión
+	if !strings.HasSuffix(handler.Filename, ".sdaa") {
+		http.Error(w, "Solo se permiten archivos .sdaa", http.StatusBadRequest)
+		return
+	}
+
+	// Ruta donde se almacenará
+	savePath := "./uploads/" + handler.Filename
+
+	// Crea el archivo en el servidor
+	dst, err := os.Create(savePath)
+	if err != nil {
+		http.Error(w, "No se pudo guardar el archivo", http.StatusInternalServerError)
+		return
+	}
+	defer dst.Close()
+
+	// Copia el contenido del archivo recibido al nuevo archivo
+	_, err = io.Copy(dst, file)
+	if err != nil {
+		http.Error(w, "Error al guardar el archivo", http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Println("✅ Archivo guardado en:", savePath)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Archivo subido exitosamente",
+		"path":    savePath,
+	})
+}
+
 func main() {
 	// Initialize router
 	r := mux.NewRouter()
@@ -135,6 +182,7 @@ func main() {
 	r.HandleFunc("/api/run_command", doExecute).Methods("POST")
 	r.HandleFunc("/api/disks/{letter}/partitions", getDiskPartitions).Methods("GET")
 	r.HandleFunc("/api/fs", file_system.GetFileSystem).Methods("GET")
+	r.HandleFunc("/api/upload", uploadSDAAFile).Methods("POST")
 
 	// CORS setup
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})

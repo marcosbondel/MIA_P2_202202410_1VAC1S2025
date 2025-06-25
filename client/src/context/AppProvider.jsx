@@ -8,10 +8,12 @@ import queryString from "query-string"
 
 const init = () => {
     return {
-        logged: JSON.parse(localStorage.getItem('logged')) || false,
+        logged: false,
         error: "",
+        successMessage: "",
         result: {},
         showError: false,
+        showSuccess: false,
         disks: [],
         partitions: [],
         current_fs_location: '/',
@@ -44,7 +46,6 @@ export const AppProvider = ({ children }) => {
         const data = await response.json();
         console.log("Login successful:", data);
         dispatch({ type: 'logged[set]', payload: { logged: true } });
-        localStorage.setItem('logged', JSON.stringify(true));
 
         navigate('/mia')
     }
@@ -90,7 +91,6 @@ export const AppProvider = ({ children }) => {
         }
 
         dispatch({ type: 'logged[set]', payload: { logged: false } });
-        localStorage.removeItem('logged');
 
         navigate('/login');
     }
@@ -125,8 +125,11 @@ export const AppProvider = ({ children }) => {
     }
     
     const dispatchCurrentFSLocation = (path) => {
-        console.log(`Dispatching current_fs_location: ${path}`);
         dispatch({ type: 'current_fs_location[set]', payload: { current_fs_location: path } });
+    }
+
+    const showSuccessMessage = (message) => {
+        dispatch({ type: 'showSuccess[set]', payload: { successMessage: message } });
     }
 
     useEffect(() => {
@@ -142,13 +145,10 @@ export const AppProvider = ({ children }) => {
             logout,
             getPartitions,
             getFileSystem,
-            dispatchCurrentFSLocation
+            dispatchCurrentFSLocation,
+            showSuccessMessage
         }}>
             {children}
-            {/* { state.error.length != 0 && */}
-                {/* <Alert severity="warning">This is a warning Alert.</Alert> */}
-            {/* } */}
-            <pre>{ state.showError }</pre>
             <Snackbar
                 open={state.showError}
                 autoHideDuration={3000}
@@ -156,6 +156,14 @@ export const AppProvider = ({ children }) => {
                 message={state.error}
                 anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
                 color="error"
+            />
+            <Snackbar
+                open={state.showSuccess}
+                autoHideDuration={3000}
+                onClose={() => dispatch({ type: 'showSuccess[set]', payload: { successMessage: "" } })}
+                message={state.successMessage}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                color="info"
             />
         </AppContext.Provider>
     )

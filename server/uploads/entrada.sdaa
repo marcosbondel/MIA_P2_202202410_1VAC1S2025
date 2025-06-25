@@ -1,0 +1,173 @@
+rmdisk -driveletter=A
+rmdisk -driveletter=B
+rmdisk -driveletter=C
+rmdisk -driveletter=D
+
+mkdisk -size=10 -unit=M
+mkdisk -size=12
+mkdisk -size=10 -unit=M
+mkdisk -size=12
+
+# ERROR NO EXISTE EL DISCO
+fdisk -type=P -driveletter=Z -size=500 -unit=K -name=error1
+#pause
+
+fdisk -type=P -driveletter=A -size=500 -unit=K -name=particion1
+fdisk -type=P -driveletter=A -size=700 -unit=K -name=particion2
+fdisk -type=P -driveletter=A -size=900 -unit=K -name=particion3
+fdisk -type=E -driveletter=A -size=900 -unit=K -name=particion4
+fdisk -type=P -driveletter=B -size=100 -unit=K -name=particion1
+fdisk -type=P -driveletter=B -size=200 -unit=K -name=particion2
+fdisk -type=P -driveletter=C -size=100 -unit=K -name=particion1
+fdisk -type=P -driveletter=C -size=200 -unit=K -name=particion2
+
+fdisk -delete=full -driveletter=A -name="particion4"
+fdisk -add=-200 -unit=K -driveletter=A -name="particion3"
+fdisk -add=200 -unit=K -driveletter=A -name="particion1"
+fdisk -add=100 -unit=K -driveletter=B -name="particion1"
+fdisk -add=100 -unit=K -driveletter=C -name="particion1"
+
+mount -driveletter=A -name=particion1
+mount -driveletter=A -name=particion2
+mount -name=particion3 -driveletter=A
+mount -driveletter=B -name=particion1
+mount -name=particion1 -driveletter=C
+
+# ERROR NO EXISTE EL ID
+unmount -id=E160
+unmount -id=F260
+#pause 
+
+# =====COLOCAR LOS DÍGITOS DEL CARNET=====
+unmount -id=A210
+unmount -id=A310
+
+# =====COLOCAR LOS DÍGITOS DEL CARNET=====
+mkfs -type=full -id=A110 -fs=3fs
+mkfs -type=full -id=B110 -fs=2fs
+mkfs -type=full -id=C110 -fs=3fs
+#pause
+
+# ERROR NO EXISTE EL USUARIO
+login -user=user -pass=123 -id=A110
+#pause 
+
+login -user=root -pass=123 -id=A110
+
+mkgrp -name=grupo1
+mkgrp -name=grupo2
+mkgrp -name=grupo3
+mkgrp -name=grupo4
+mkgrp -name=grupo5
+mkgrp -name=grupo6
+mkgrp -name=grupo7
+mkgrp -name=grupo8
+mkgrp -name=grupo9
+
+rmgrp -name=grupo2
+rmgrp -name=grupo4
+rmgrp -name=grupo6
+rmgrp -name=grupo8
+
+mkusr -user=user1 -pass=123 -grp=grupo1
+mkusr -user=user2 -pass=123 -grp=grupo1
+
+# ERROR USUARIO REPETIDO
+mkusr -user=user1 -pass=123 -grp=grupo3
+#pause
+
+# ERROR GRUPO ELIMINADO
+mkusr -user=user3 -pass=123 -grp=grupo8
+#pause
+
+rmusr -user=user2
+
+# ERROR USUARIO ELIMINADO
+rmusr -user=user2
+#pause
+
+logout
+
+#ERROR NO HAY SESION INICIADA
+logout 
+#pause 
+
+
+
+login -user=user1 -pass=123 -id=A110
+
+mkfile -size=15 -path=/home/user/docs/a.txt -r
+
+# ERROR DIRECTORIO NO CREADO
+mkfile -path="/home/mis documentos/archivo 1.txt"
+#pause
+
+cat -file1=/home/user/docs/a.txt
+
+# ERROR NO EXISTE EL ARCHIVO
+cat -file1=/home/user/docs/b.txt
+#pause
+
+mkdir -r -path=/home/user/docs/tareas
+mkdir -r -path=/home/user/docs/proyectos
+
+# ERROR NO EXISTE LA CARPETA ARCHVIOS
+mkdir -r -path=/home/user/archivos/proyecto1
+#pause
+
+find -path=/ -name=*
+find -path=/home/user/docs -name=*
+
+# ERROR NO EXISTE EL ARCHIVO
+find -path=/home/user/docs -name=b.txt
+#pause
+
+logout
+
+# ERROR AL CERRAR SESIÓN
+logout
+
+
+
+
+
+
+
+# Reportes
+# MRB
+rep -name=mbr -path=mbr.png -id=A110
+
+# Disk
+rep -name=disk -path=diskA.png -id=A110
+#rep -name=disk -path=diskB.png -id=B110
+#rep -name=disk -path=diskC.png -id=C110
+#rep -name=disk -path=diskD.png -id=D110
+
+
+# inode
+login -user=user1 -pass=123 -id=A110
+rep -id=A110 -path=inodoA110.jpg -name=inode
+
+# block
+rep -id=A110 -path=block.jpg -name=block
+
+# block bm_inode
+rep -id=A110 -path=bm_inode.txt -name=bm_inode
+
+# block bm_bloc
+rep -id=A110 -path=bm_bloc.txt -name=bm_bloc
+
+# tree
+rep -id=A110 -path=tree.jpg -name=tree
+
+# Superbloque sb
+rep -id=A110 -path=sb.jpg -name=sb
+
+# File
+#rep -id=A110 -path=reportefile.txt -name=file -ruta=/Users/macbookair/Documents/testfiles/a.txt
+#rep -id=A110 -path=contenido.txt -name=file -ruta=/Users/macbookair/Documents/testfiles/a.txt
+rep -id=A110 -path=contenido.txt -name=file -ruta=/users.txt
+
+# LS
+#rep -id=A110 -path=./ls_report.jpg -ruta=/ -name=ls
+rep -id=A110 -path=ls_home.txt -ruta=/ -name=ls

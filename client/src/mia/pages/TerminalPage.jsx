@@ -1,4 +1,4 @@
-import { Container, Toolbar, Box, TextField } from "@mui/material"
+import { Container, Toolbar, Box, TextField, Typography } from "@mui/material"
 import { useState, useRef, useEffect } from "react"
 import { MIALayout } from "../layout/MIALayout"
 
@@ -65,12 +65,12 @@ export const TerminalPage = () => {
     return (
         // <MIALayout>
             <Container >
-                <Toolbar />
-                <Toolbar />
+                <Typography variant="h3" sx={{margin: 5, textAlign: 'center'}}>MIA Terminal</Typography>
                 <Box
                     sx={{
                         backgroundColor: "#1e1e1e",
                         color: "#d4d4d4",
+                        marginTop: 2,
                         padding: 2,
                         borderRadius: 2,
                         height: "70vh",
@@ -85,7 +85,7 @@ export const TerminalPage = () => {
                         <Box key={idx}>{line}</Box>
                     ))}
 
-                    <Box sx={{ display: "flex" }}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
                         <Box sx={{ mr: 1 }}>$</Box>
                         <TextField
                             variant="standard"

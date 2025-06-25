@@ -47,6 +47,13 @@ export const appReducer = ( state, action) => {
                 ...state,
                 current_file_content: action.payload.current_file_content
             }
+        case 'showSuccess[set]':
+            console.log("Setting success message:", action.payload.successMessage);
+            return {
+                ...state,
+                showSuccess: action.payload.successMessage != "",
+                successMessage: action.payload.successMessage
+            }
         default:
             break;
     }
