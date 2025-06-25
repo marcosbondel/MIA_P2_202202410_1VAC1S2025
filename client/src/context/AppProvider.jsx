@@ -3,6 +3,8 @@ import { AppContext } from "./AppContext"
 import { appReducer } from "./appReducer";
 import { Alert, Snackbar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import queryString from "query-string"
 
 const init = () => {
     return {
@@ -11,7 +13,12 @@ const init = () => {
         result: {},
         showError: false,
         disks: [],
-        partitions: []
+        partitions: [],
+        current_fs_location: '/',
+        current_fs: '',
+        current_directory: '',
+        directory_parts: '',
+        current_file_content: '',
     }
 }
 
@@ -51,7 +58,6 @@ export const AppProvider = ({ children }) => {
         }
 
         const disks = await response.json();
-        console.log("Disks fetched successfully:", disks);
 
         dispatch({ type: 'disks[set]', payload: disks });
     }
@@ -66,7 +72,6 @@ export const AppProvider = ({ children }) => {
         }
 
         const partitions = await response.json();
-
         dispatch({ type: 'partitions[set]', payload: {partitions} });
     }
 
@@ -86,15 +91,46 @@ export const AppProvider = ({ children }) => {
 
         dispatch({ type: 'logged[set]', payload: { logged: false } });
         localStorage.removeItem('logged');
-        console.log("Logout successful");
 
         navigate('/login');
     }
 
+    const getFileSystem = async() => {
+        let url = 'http://localhost:3000/api/fs'
+
+        if(state.current_fs_location != '/'){
+            url = `${url}?path=${state.current_fs_location}`;
+        }else{
+            url = `${url}?path=/`;
+        }
+
+        const response = await fetch(url)
+
+        if(!response.ok) {
+            const error = await response.json();
+            console.error("Failed to fetch filesystem:", error);
+            dispatch({ type: 'error[set]', payload: { error: "Failed to fetch filesystem" } });
+            return
+        }
+        const data = await response.json();
+        console.log(data)
+        dispatch({ type: 'current_fs[set]', payload: { current_fs: data } });
+        dispatch({ type: 'current_directory[set]', payload: { current_directory: data?.children } });
+        dispatch({ type: 'directory_parts[set]', payload: { directory_parts: data.path.split("/").slice(1) } });
+        if(data?.type == 'file'){
+            dispatch({ type: 'current_file_content[set]', payload: { current_file_content: data.content } });
+        }else{
+            dispatch({ type: 'current_file_content[set]', payload: { current_file_content: '' } });
+        }
+    }
+    
+    const dispatchCurrentFSLocation = (path) => {
+        console.log(`Dispatching current_fs_location: ${path}`);
+        dispatch({ type: 'current_fs_location[set]', payload: { current_fs_location: path } });
+    }
+
     useEffect(() => {
-
         getDisks()
-
     }, [])
     
 
@@ -104,7 +140,9 @@ export const AppProvider = ({ children }) => {
             login,
             getDisks,
             logout,
-            getPartitions
+            getPartitions,
+            getFileSystem,
+            dispatchCurrentFSLocation
         }}>
             {children}
             {/* { state.error.length != 0 && */}
