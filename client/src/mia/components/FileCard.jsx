@@ -26,18 +26,38 @@ export const FileCard = ({dir}) => {
 
     return (
         <Grid item xs={12} sm={6} md={4} lg={3}>
-        {/* <CardContent> */}
-            {/* <Box> */}
-                <IconButton onClick={handleDocumentClick}>
-                    { dir.type === "directory" ? (
-                        <FolderOutlined sx={{ fontSize: '6rem', color: 'primary.main' }}/>
-                    ) : (
-                        <ArticleOutlined sx={{ fontSize: '6rem', color: 'primary.main' }}/>
-                    )}
-                </IconButton>
-                <Typography variant="h5" align="center">{ dir.name }</Typography>
-            {/* </Box> */}
-        {/* </CardContent> */}
+            <Card>
+                <CardContent onClick={handleDocumentClick} sx={{ cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <IconButton >
+                        { dir.type === "directory" ? (
+                            <FolderOutlined sx={{ fontSize: '6rem', color: 'primary.main' }}/>
+                        ) : (
+                            <ArticleOutlined sx={{ fontSize: '6rem', color: 'primary.main' }}/>
+                        )}
+                    </IconButton>
+                    <Typography variant="h5" align="center">{ dir.name }</Typography>
+                    <Typography variant="o" align="left">
+                        { dir.type == 'file' && (
+                            <>
+                                <strong>Size:</strong> {dir.size}
+                                <br />
+                            </>
+                        )}
+                        <strong>Perm:</strong> {dir.perm}
+                        <br />
+                        {/* { dir.type == 'file' && (
+                            <>
+                                <strong>Created at:</strong>
+                                <br />
+                                {dir.created_at}
+                            </>
+                        )} */}
+                    </Typography>
+                </CardContent>
+                {/* <CardActions>
+
+                </CardActions> */}
+            </Card>
         </Grid>
     )
 }

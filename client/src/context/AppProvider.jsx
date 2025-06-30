@@ -8,7 +8,7 @@ import queryString from "query-string"
 
 const init = () => {
     return {
-        logged: false,
+        logged: JSON.parse(localStorage.getItem('logged')) || false,
         error: "",
         successMessage: "",
         result: {},
@@ -46,6 +46,7 @@ export const AppProvider = ({ children }) => {
         const data = await response.json();
         console.log("Login successful:", data);
         dispatch({ type: 'logged[set]', payload: { logged: true } });
+        localStorage.setItem('logged', JSON.stringify(true));
 
         navigate('/mia')
     }
@@ -59,8 +60,8 @@ export const AppProvider = ({ children }) => {
         }
 
         const disks = await response.json();
-
         dispatch({ type: 'disks[set]', payload: disks });
+        console.log(`Disks fetched successfully:`, disks);
     }
 
     const getPartitions = async(disk) => {
@@ -74,6 +75,7 @@ export const AppProvider = ({ children }) => {
 
         const partitions = await response.json();
         dispatch({ type: 'partitions[set]', payload: {partitions} });
+        console.log(`Partitions: `, partitions);
     }
 
     const logout = async() => {
@@ -91,6 +93,7 @@ export const AppProvider = ({ children }) => {
         }
 
         dispatch({ type: 'logged[set]', payload: { logged: false } });
+        localStorage.removeItem('logged');
 
         navigate('/login');
     }

@@ -1,4 +1,4 @@
-import { Card, CardActions, CardContent, Grid, Typography } from "@mui/material"
+import { Button, Card, CardActions, CardContent, Grid, Typography } from "@mui/material"
 import { useNavigate, useParams } from "react-router-dom";
 
 export const PartitionCard = ({partition}) => {
@@ -14,10 +14,25 @@ export const PartitionCard = ({partition}) => {
             <Card sx={{ minWidth: 275 }}>
                 <CardContent>
                     <Typography>Partition</Typography>
-                    <Typography variant="h5" align="center">{ partition.name }</Typography>
+                    <Typography variant="h5" align="center" sx={{ marginTop: 2, marginBottom: 2 }}>{ partition.name }</Typography>
+                    <Typography variant="p">
+                        <strong>Mounted:</strong> {partition.mounted}
+                        <br />
+                        <strong>Size:</strong> {partition.size}
+                        <br />
+                        <strong>Fit:</strong> {partition.fit}
+                        <br />
+                        <strong>Type:</strong> {partition.type}
+                    </Typography>
                 </CardContent>
                 <CardActions>
-                    <Typography variant="body2">Size: {partition.size}</Typography>
+                    <Button 
+                        variant="outlined"
+                        fullWidth
+                        onClick={handlePartitionClick}
+                    >
+                        FS
+                    </Button>
                 </CardActions>
             </Card>
         </Grid>

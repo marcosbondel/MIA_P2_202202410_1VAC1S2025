@@ -3,3 +3,8 @@
     go run ./main.go
     go mod tidy # solve dependencies
 ```
+
+### Connect to the EC2 Instance
+```shell
+    ssh -i mia_202202410.pem ubuntu@18.226.34.197
+```

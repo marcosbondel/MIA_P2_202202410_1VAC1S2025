@@ -1,22 +1,37 @@
-import { Card, CardActions, CardContent, Grid, Typography } from "@mui/material"
+import { Button, Card, CardActions, CardContent, Grid, Typography } from "@mui/material"
 import { useNavigate } from "react-router-dom";
 
 export const DiskCard = ({disk}) => {
     const navigate = useNavigate();
 
     const handleDiskClick = () => {
-        navigate(`/mia/disks/${disk}`);
+        navigate(`/mia/disks/${disk.name}`);
     }
 
     return (
-        <Grid item key={disk} xs={12} sm={6} md={4} lg={3} onClick={handleDiskClick}>
+        <Grid xs={12} sm={6} md={4} lg={3}>
             <Card sx={{ minWidth: 275 }}>
                 <CardContent>
-                    <Typography>Disk</Typography>
-                    <Typography variant="h5" align="center">{ disk }</Typography>
+                    <Typography variant="div">Disk</Typography>
+                    <Typography variant="h3" align="center" sx={{ marginTop: 2, marginBottom: 2 }}>{ disk.name }</Typography>
+                    <Typography variant="p">
+                        <strong>Size:</strong> {disk.size}
+                        <br />
+                        <strong>Signature:</strong> {disk.signature}
+                        <br />
+                        <strong>Fit:</strong> {disk.fit}
+                        <br />
+                        <strong>Partitions:</strong> {disk.partitions?.length}
+                    </Typography>
                 </CardContent>
                 <CardActions>
-                    <Typography variant="body2">Size: 0</Typography>
+                    <Button 
+                        variant="outlined"
+                        fullWidth
+                        onClick={handleDiskClick}
+                    >
+                        Partitions
+                    </Button>
                 </CardActions>
             </Card>
         </Grid>

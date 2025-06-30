@@ -19,7 +19,7 @@ export const TerminalPage = () => {
         });
         if (!response.ok) {
             console.log(`Error executing command: ${command}`);
-            return;
+            return; 
         }
 
         const data = await response.json();
@@ -64,7 +64,7 @@ export const TerminalPage = () => {
 
     return (
         // <MIALayout>
-            <Container >
+            <Container mb={5} sx={{ paddingTop: 10 }}>
                 <Typography variant="h3" sx={{margin: 5, textAlign: 'center'}}>MIA Terminal</Typography>
                 <Box
                     sx={{

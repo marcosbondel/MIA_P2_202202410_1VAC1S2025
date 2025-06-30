@@ -264,18 +264,56 @@ func create_ext3(n int32, partition structs.Partition, sb structs.Superblock, da
 }
 
 // ListDisks escanea la carpeta ./test y retorna una lista de discos disponibles
-func ListDisks() ([]string, error) {
+// controllers/disk_controller.go
+func ListDisks() ([]models.DiskInfo, error) {
 	files, err := ioutil.ReadDir("./fs/test")
 	if err != nil {
 		return nil, err
 	}
 
-	var disks []string
+	var disks []models.DiskInfo
 	for _, file := range files {
 		if !file.IsDir() && strings.HasSuffix(file.Name(), ".bin") {
-			disks = append(disks, strings.TrimSuffix(file.Name(), ".bin"))
+			filePath := "./fs/test/" + file.Name()
+			f, err := os.Open(filePath)
+			if err != nil {
+				continue
+			}
+
+			var mbr structs.MRB
+			if err := utils.ReadObject(f, &mbr, 0); err != nil {
+				f.Close()
+				continue
+			}
+			f.Close()
+
+			var partitions []models.PartitionInfo
+			for _, p := range mbr.Partitions {
+				if p.Size == 0 {
+					continue
+				}
+				partitions = append(partitions, models.PartitionInfo{
+					Status: strings.Trim(string(p.Status[:]), "\x00"),
+					Type:   strings.ToUpper(strings.Trim(string(p.Type[:]), "\x00")),
+					Fit:    strings.Trim(string(p.Fit[:]), "\x00"),
+					Start:  p.Start,
+					Size:   p.Size,
+					Name:   strings.Trim(string(p.Name[:]), "\x00"),
+				})
+			}
+
+			disk := models.DiskInfo{
+				Name:       strings.TrimSuffix(file.Name(), ".bin"),
+				Size:       mbr.MbrSize,
+				Creation:   strings.Trim(string(mbr.CreationDate[:]), "\x00"),
+				Fit:        strings.Trim(string(mbr.Fit[:]), "\x00"),
+				Signature:  mbr.Signature,
+				Partitions: partitions,
+			}
+			disks = append(disks, disk)
 		}
 	}
+
 	return disks, nil
 }
 
@@ -293,16 +331,45 @@ func GetDiskPartitions(driveLetter string) ([]models.PartitionInfo, error) {
 	}
 
 	var partitions []models.PartitionInfo
-	for _, part := range mbr.Partitions {
+
+	for i, part := range mbr.Partitions {
 		if part.Size == 0 {
 			continue
 		}
 
 		partType := strings.ToLower(strings.Trim(string(part.Type[:]), "\x00"))
+		partStatus := strings.Trim(string(part.Status[:]), "\x00")
+		partFit := strings.Trim(string(part.Fit[:]), "\x00")
+		partName := strings.Trim(string(part.Name[:]), "\x00")
+		partId := strings.Trim(string(part.Id[:]), "\x00")
+		mounted := partStatus == "1"
+
 		if partType == "e" {
-			// Leer particiones lógicas desde EBRs
+			// Añadir partición extendida
+			extended := models.PartitionInfo{
+				Status:         partStatus,
+				Type:           "E",
+				Fit:            partFit,
+				Start:          part.Start,
+				Size:           part.Size,
+				Name:           partName,
+				Id:             partId,
+				Mounted:        mounted,
+				PartitionIndex: i + 1,
+			}
+			partitions = append(partitions, extended)
+
+			// Procesar EBRs correctamente
 			next := part.Start
+			visited := make(map[int32]bool)
+
 			for {
+				if visited[next] {
+					fmt.Println("Ciclo detectado en EBR, abortando...")
+					break
+				}
+				visited[next] = true
+
 				var ebr structs.EBR
 				if err := utils.ReadObject(file, &ebr, int64(next)); err != nil {
 					break
@@ -310,12 +377,16 @@ func GetDiskPartitions(driveLetter string) ([]models.PartitionInfo, error) {
 
 				if ebr.PartSize > 0 {
 					p := models.PartitionInfo{
-						Status: fmt.Sprintf("%d", ebr.PartStatus),
-						Type:   "L",
-						Fit:    strings.Trim(string(ebr.PartFit[:]), "\x00"),
-						Start:  ebr.PartStart,
-						Size:   ebr.PartSize,
-						Name:   strings.Trim(string(ebr.PartName[:]), "\x00"),
+						Status:    fmt.Sprintf("%d", ebr.PartStatus),
+						Type:      "L",
+						Fit:       strings.Trim(string(ebr.PartFit[:]), "\x00"),
+						Start:     ebr.PartStart,
+						Size:      ebr.PartSize,
+						Name:      strings.Trim(string(ebr.PartName[:]), "\x00"),
+						Mounted:   ebr.PartStatus == 1,
+						IsLogical: true,
+						PartNext:  ebr.PartNext,
+						EBRStart:  next,
 					}
 					partitions = append(partitions, p)
 				}
@@ -326,21 +397,23 @@ func GetDiskPartitions(driveLetter string) ([]models.PartitionInfo, error) {
 				next = ebr.PartNext
 			}
 		} else {
+			// Partición primaria
 			p := models.PartitionInfo{
-				Status: strings.Trim(string(part.Status[:]), "\x00"),
-				Type:   strings.ToUpper(strings.Trim(string(part.Type[:]), "\x00")),
-				Fit:    strings.Trim(string(part.Fit[:]), "\x00"),
-				Start:  part.Start,
-				Size:   part.Size,
-				Name:   strings.Trim(string(part.Name[:]), "\x00"),
+				Status:         partStatus,
+				Type:           "P",
+				Fit:            partFit,
+				Start:          part.Start,
+				Size:           part.Size,
+				Name:           partName,
+				Id:             partId,
+				Mounted:        mounted,
+				PartitionIndex: i + 1,
 			}
 			partitions = append(partitions, p)
 		}
 	}
 
-	fmt.Println("Particiones encontradas:", len(partitions))
-	fmt.Println("Particiones:", partitions)
-
+	fmt.Printf("✅ Particiones encontradas (%s): %d\n", driveLetter, len(partitions))
 	return partitions, nil
 }
 
@@ -353,7 +426,7 @@ func GetFileSystem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Obtener ID de sesión activa (simulado por ahora como A110)
+	// Simular sesión activa
 	id := "A110"
 	driveLetter := string(id[0])
 	binPath := "./fs/test/" + strings.ToUpper(driveLetter) + ".bin"
@@ -393,8 +466,9 @@ func GetFileSystem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if inode.I_type[0] == '0' { // Es carpeta
-		var children []map[string]string
+	// Si es directorio
+	if inode.I_type[0] == '0' {
+		var children []map[string]interface{}
 
 		for _, blockIndex := range inode.I_block {
 			if blockIndex == -1 {
@@ -405,6 +479,7 @@ func GetFileSystem(w http.ResponseWriter, r *http.Request) {
 			if err := utils.ReadObject(file, &folderBlock, blockOffset); err != nil {
 				continue
 			}
+
 			for _, entry := range folderBlock.B_content {
 				name := strings.Trim(string(entry.B_name[:]), "\x00")
 				if name == "" || name == "." || name == ".." {
@@ -419,24 +494,45 @@ func GetFileSystem(w http.ResponseWriter, r *http.Request) {
 				if childInode.I_type[0] == '0' {
 					entryType = "directory"
 				}
-				children = append(children, map[string]string{
-					"name": name,
-					"type": entryType,
+
+				children = append(children, map[string]interface{}{
+					"name":        name,
+					"type":        entryType,
+					"uid":         childInode.I_uid,
+					"gid":         childInode.I_gid,
+					"size":        childInode.I_size,
+					"perm":        strings.Trim(string(childInode.I_perm[:]), "\x00"),
+					"created_at":  strings.Trim(string(childInode.I_ctime[:]), "\x00"),
+					"modified_at": strings.Trim(string(childInode.I_mtime[:]), "\x00"),
+					"accessed_at": strings.Trim(string(childInode.I_atime[:]), "\x00"),
 				})
 			}
 		}
 
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"type":     "directory",
-			"path":     path,
-			"children": children,
+			"type":        "directory",
+			"path":        path,
+			"uid":         inode.I_uid,
+			"gid":         inode.I_gid,
+			"perm":        strings.Trim(string(inode.I_perm[:]), "\x00"),
+			"modified_at": strings.Trim(string(inode.I_mtime[:]), "\x00"),
+			"children":    children,
 		})
-	} else { // Es archivo
+
+	} else {
+		// Es archivo
 		content := utils_inodes.GetInodeFileData(inode, file, sb)
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"type":    "file",
-			"path":    path,
-			"content": content,
+			"type":        "file",
+			"path":        path,
+			"uid":         inode.I_uid,
+			"gid":         inode.I_gid,
+			"perm":        strings.Trim(string(inode.I_perm[:]), "\x00"),
+			"size":        inode.I_size,
+			"created_at":  strings.Trim(string(inode.I_ctime[:]), "\x00"),
+			"modified_at": strings.Trim(string(inode.I_mtime[:]), "\x00"),
+			"accessed_at": strings.Trim(string(inode.I_atime[:]), "\x00"),
+			"content":     content,
 		})
 	}
 }

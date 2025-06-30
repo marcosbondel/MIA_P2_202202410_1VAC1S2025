@@ -56,9 +56,9 @@ export const NavBar = () => {
                             gap: 2,
                         }}
                     >
-                        {/* <IconButton onClick={goToTerminal}>
+                        <IconButton onClick={goToTerminal}>
                             <Terminal sx={{ fontSize: '3rem', color: 'primary.main' }}/>
-                        </IconButton> */}
+                        </IconButton>
                         <form onSubmit={onLogout}>
                             <Button variant="contained" type="submit">Logout</Button>
                         </form>

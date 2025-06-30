@@ -22,8 +22,8 @@ export const MIAPage = ({children}) => {
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    { disks && disks.map((disk) => (
-                        <DiskCard disk={disk} key={disk} />
+                    { disks && disks.map((disk, index) => (
+                        <DiskCard disk={disk} key={index} />
                     ))}
                 </Grid>
             </Container>
