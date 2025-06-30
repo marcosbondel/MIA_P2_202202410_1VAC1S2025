@@ -1,6 +1,7 @@
 import { Container, Toolbar, Box, TextField, Typography } from "@mui/material"
 import { useState, useRef, useEffect } from "react"
-import { MIALayout } from "../layout/MIALayout"
+
+import { url } from "../../api/url"
 
 export const TerminalPage = () => {
     const [lines, setLines] = useState(["Welcome to MIA Terminal. Type a command."]);
@@ -10,7 +11,7 @@ export const TerminalPage = () => {
     const runCommand = async(command) => {
         // Placeholder for command execution logic
         console.log(`Executing command: ${command}`);
-        const response = await fetch(`http://localhost:3000/api/run_command`, {
+        const response = await fetch(`${url.base}/api/run_command`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

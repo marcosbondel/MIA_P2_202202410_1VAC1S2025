@@ -2,6 +2,8 @@ import { Button, Grid, TextField } from "@mui/material";
 import { useContext, useState } from "react";
 import { AppContext } from "../../context/AppContext";
 
+import { url } from "../../api/url";
+
 export const UploadFile = () => {
     const [file, setFile] = useState(null);
     const { showSuccessMessage } = useContext(AppContext);
@@ -12,7 +14,7 @@ export const UploadFile = () => {
         const formData = new FormData();
         formData.append("file", file);
 
-        const res = await fetch("http://localhost:3000/api/upload", {
+        const res = await fetch(`${url.base}/api/upload`, {
         method: "POST",
         body: formData,
         });

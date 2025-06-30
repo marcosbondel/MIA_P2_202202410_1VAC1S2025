@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import queryString from "query-string"
 
+import { url } from "../api/url";
+
 const init = () => {
     return {
         logged: JSON.parse(localStorage.getItem('logged')) || false,
@@ -30,7 +32,7 @@ export const AppProvider = ({ children }) => {
     const navigate = useNavigate();
 
     const login = async(id, username, password) => {
-        const response = await fetch('http://localhost:3000/api/auth/login', {
+        const response = await fetch(`${url.base}/api/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -53,7 +55,7 @@ export const AppProvider = ({ children }) => {
     }
 
     const getDisks = async() => {
-        const response = await fetch('http://localhost:3000/api/disks');
+        const response = await fetch(`${url.base}/api/disks`);
         if(!response.ok) {
             const error = await response.json();
             console.error("Failed to fetch disks:", error);
@@ -66,7 +68,7 @@ export const AppProvider = ({ children }) => {
     }
 
     const getPartitions = async(disk) => {
-        const response = await fetch(`http://localhost:3000/api/disks/${disk}/partitions`);
+        const response = await fetch(`${url.base}/api/disks/${disk}/partitions`);
         if(!response.ok) {
             const error = await response.json();
             console.error("Failed to fetch partitions:", error);
@@ -80,7 +82,7 @@ export const AppProvider = ({ children }) => {
     }
 
     const logout = async() => {
-        const response = await fetch('http://localhost:3000/api/auth/logout', {
+        const response = await fetch(`${url.base}/api/auth/logout`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -100,7 +102,7 @@ export const AppProvider = ({ children }) => {
     }
 
     const getFileSystem = async() => {
-        let url = `http://localhost:3000/api/fs?id=${state.fs_id}`;
+        let url = `${url.base}/api/fs?id=${state.fs_id}`;
 
         if(state.current_fs_location != '/'){
             url = `${url}&path=${state.current_fs_location}`;
