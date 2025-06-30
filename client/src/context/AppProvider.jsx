@@ -21,6 +21,7 @@ const init = () => {
         current_directory: '',
         directory_parts: '',
         current_file_content: '',
+        fs_id: '',
     }
 }
 
@@ -99,13 +100,15 @@ export const AppProvider = ({ children }) => {
     }
 
     const getFileSystem = async() => {
-        let url = 'http://localhost:3000/api/fs'
+        let url = `http://localhost:3000/api/fs?id=${state.fs_id}`;
 
         if(state.current_fs_location != '/'){
-            url = `${url}?path=${state.current_fs_location}`;
+            url = `${url}&path=${state.current_fs_location}`;
         }else{
-            url = `${url}?path=/`;
+            url = `${url}&path=/`;
         }
+
+        console.log(`Fetching filesystem from: ${url}`);
 
         const response = await fetch(url)
 
@@ -135,6 +138,11 @@ export const AppProvider = ({ children }) => {
         dispatch({ type: 'showSuccess[set]', payload: { successMessage: message } });
     }
 
+    const modifyFSId = (id) => {
+        console.log(`Modifying fs_id to: ${id}`);
+        dispatch({ type: 'fs_id[set]', payload: { fs_id: id } });
+    }
+
     useEffect(() => {
         getDisks()
     }, [])
@@ -149,7 +157,8 @@ export const AppProvider = ({ children }) => {
             getPartitions,
             getFileSystem,
             dispatchCurrentFSLocation,
-            showSuccessMessage
+            showSuccessMessage,
+            modifyFSId
         }}>
             {children}
             <Snackbar

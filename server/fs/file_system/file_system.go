@@ -263,7 +263,7 @@ func create_ext3(n int32, partition structs.Partition, sb structs.Superblock, da
 	fmt.Println("======End CREATE EXT3======")
 }
 
-// ListDisks escanea la carpeta ./test y retorna una lista de discos disponibles
+// ListDisks escanea la carpeta ./fs/test y retorna una lista de discos disponibles
 // controllers/disk_controller.go
 func ListDisks() ([]models.DiskInfo, error) {
 	files, err := ioutil.ReadDir("./fs/test")
@@ -421,13 +421,14 @@ func GetFileSystem(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	path := r.URL.Query().Get("path")
+	id := r.URL.Query().Get("id")
 	if path == "" {
 		http.Error(w, "path is required", http.StatusBadRequest)
 		return
 	}
 
 	// Simular sesión activa
-	id := "A110"
+	// id := "A110"
 	driveLetter := string(id[0])
 	binPath := "./fs/test/" + strings.ToUpper(driveLetter) + ".bin"
 

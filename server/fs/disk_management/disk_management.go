@@ -382,13 +382,13 @@ func Mkdisk(size int, fit string, unit string, buffer_response *string) {
 	}
 
 	// Find available disk name
-	diskLetter := utils.FindAvailableLetter("./test")
+	diskLetter := utils.FindAvailableLetter("./fs/test")
 	if diskLetter == "" {
 		fmt.Println("Error: No more available letters for disks")
 		*buffer_response += "Error: No more available letters for disks\n"
 		return
 	}
-	diskPath := fmt.Sprintf("./test/%s.bin", diskLetter)
+	diskPath := fmt.Sprintf("./fs/test/%s.bin", diskLetter)
 
 	// Create file
 	err := utils.CreateFile(diskPath)
@@ -475,7 +475,7 @@ func Rmdisk(driveLetter string, buffer_response *string) {
 	}
 
 	// Construct the file path
-	filePath := fmt.Sprintf("./test/%s.bin", driveLetter)
+	filePath := fmt.Sprintf("./fs/test/%s.bin", driveLetter)
 
 	// Delete the file
 	if err := utils.DeleteFile(filePath); err != nil {

@@ -20,7 +20,7 @@ export const DiskPage = () => {
                 container
                 spacing={2}
                 direction="row"
-                justifyContent="space-between"
+                justifyContent="left"
                 alignItems="center"
             >
                 { (partitions && partitions.length > 0 ? (

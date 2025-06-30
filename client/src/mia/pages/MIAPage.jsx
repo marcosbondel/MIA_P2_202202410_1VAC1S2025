@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { MIALayout } from "../layout/MIALayout";
 import { Card, CardActions, CardContent, Container, Grid, Toolbar, Typography } from "@mui/material";
 import { AppContext } from "../../context/AppContext";
@@ -7,7 +7,12 @@ import { Outlet } from "react-router-dom";
 
 export const MIAPage = ({children}) => {
 
-    const { disks } = useContext(AppContext);
+    const { disks, dispatchCurrentFSLocation } = useContext(AppContext);
+
+
+    useEffect(() => {
+        dispatchCurrentFSLocation('/'); // Reset current filesystem location to root on page load
+    }, [])
 
     return (
         // <MIALayout>

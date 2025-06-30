@@ -1,5 +1,7 @@
 import { Button, Card, CardActions, CardContent, Grid, Typography } from "@mui/material"
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AppContext } from "../../context/AppContext";
 
 export const DiskCard = ({disk}) => {
     const navigate = useNavigate();
