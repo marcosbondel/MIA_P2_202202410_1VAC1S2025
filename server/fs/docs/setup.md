@@ -10,7 +10,7 @@
 
 ### Connect to the EC2 Instance
 ```shell
-    ssh -i mia_202202410.pem ubuntu@18.226.34.197
+    ssh -i mia_202202410.pem ubuntu@3.140.85.187
 ```
 
 ### Systemd service

@@ -17,9 +17,6 @@ export const PartitionPage = () => {
     } = useContext(AppContext)
 
 
-    const navigate = useNavigate()
-
-
     const handleOnClick = (e, part) => {
         e.preventDefault();
         // Handle click event for breadcrumb links

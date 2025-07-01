@@ -75,6 +75,12 @@ func AnalyzeHTTPInput(input string) string {
 }
 
 func AnalyzeCommnad(command string, params string, buffer_response *string) {
+	// fmt.Printf("Command: %s, Params: %s\n", command, params)
+	*buffer_response += "\n"
+	*buffer_response += "\n"
+	*buffer_response += "Executing command...\n"
+	*buffer_response += fmt.Sprintf("Command: %s, Params: %s\n", command, params)
+
 	switch command {
 	case "mkdisk":
 		fn_mkdisk(params, buffer_response)
@@ -596,8 +602,16 @@ func fn_mkdir(input string, buffer_string *string) {
 	r := fs.Bool("r", false, "Create parent directories if they do not exist")
 	// Parse the flags
 	fs.Parse(os.Args[1:])
-	// find the flags in the input
+
+	// Revisa manualmente si el flag -r aparece en el input (como palabra suelta)
+	if strings.Contains(strings.ToLower(input), "-r") && !strings.Contains(strings.ToLower(input), "-r=") {
+		*r = true
+	}
+
+	// Extrae y asigna valores manualmente usando regex
+	re := regexp.MustCompile(`-(\w+)=("[^"]+"|[^ ]+)`)
 	matches := re.FindAllStringSubmatch(input, -1)
+
 	// Process the input
 	for _, match := range matches {
 		flagName := match[1]

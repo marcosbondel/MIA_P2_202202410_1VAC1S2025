@@ -102,17 +102,17 @@ export const AppProvider = ({ children }) => {
     }
 
     const getFileSystem = async() => {
-        let url = `${url.base}/api/fs?id=${state.fs_id}`;
+        let endpoint = `${url.base}/api/fs?id=${state.fs_id}`;
 
         if(state.current_fs_location != '/'){
-            url = `${url}&path=${state.current_fs_location}`;
+            endpoint = `${endpoint}&path=${state.current_fs_location}`;
         }else{
-            url = `${url}&path=/`;
+            endpoint = `${endpoint}&path=/`;
         }
 
-        console.log(`Fetching filesystem from: ${url}`);
+        console.log(`Fetching filesystem from: ${endpoint}`);
 
-        const response = await fetch(url)
+        const response = await fetch(endpoint)
 
         if(!response.ok) {
             const error = await response.json();
